@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <title>OpenVidu Meet Tutorial</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!-- Bootstrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="css/styles.css" />
+        <script src="http://localhost:6080/meet/v1/openvidu-meet.js"></script>
+    </head>
+    <body>
+        <!-- HOME VIEW -->
+        <div id="home" class="container">
+            <!-- Rooms List Section -->
+            <div class="rooms-container">
+                <div class="rooms-header">
+                    <h2 class="text-center text-primary">Join a Room</h2>
+                    <p class="text-muted text-center">Join to an existing room</p>
+                </div>
+
+                <div class="rooms-list"></div>
+            </div>
+
+            <!-- Create Room Section -->
+            <div class="create-room">
+                <h2 class="text-center text-primary">Create a new Room</h2>
+                <p class="text-muted text-center">Generate a room from scratch</p>
+
+                <form onsubmit="createRoom(); return false;">
+                    <div class="mb-3">
+                        <label for="room-name" class="form-label">Room Name</label>
+                        <input
+                            type="text"
+                            name="roomName"
+                            id="room-name"
+                            class="form-control"
+                            placeholder="e.g. Team meeting"
+                            required
+                        />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="expiration-date" class="form-label">Expiration Date</label>
+                        <input type="date" name="expirationDate" id="expiration-date" class="form-control" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Create Room</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ROOM VIEW -->
+        <div id="room" class="container-fluid" hidden>
+            <!-- Left Sidebar Panel -->
+            <div id="control-panel" class="d-flex flex-column" hidden>
+                <!-- Commands -->
+                <div class="section">
+                    <h5>Commands</h5>
+                    <button id="end-meeting-btn" class="btn btn-danger">End Meeting</button>
+                </div>
+            </div>
+
+            <!-- Main Content Section -->
+            <div id="main-content" class="d-flex flex-column">
+                <!-- Web Component Section -->
+                <div id="meeting-container"></div>
+            </div>
+        </div>
+
+        <script src="js/app.js"></script>
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

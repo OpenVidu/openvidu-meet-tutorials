@@ -12,7 +12,7 @@
     <body>
         <!-- HOME VIEW -->
         <div id="home" class="container">
-            <!-- Rooms List Section -->
+            <!-- Rooms list section -->
             <div class="rooms-container">
                 <div class="rooms-header">
                     <h2 class="text-center text-primary">Join a Room</h2>
@@ -22,7 +22,7 @@
                 <div class="rooms-list"></div>
             </div>
 
-            <!-- Create Room Section -->
+            <!-- Create room section -->
             <div class="create-room">
                 <h2 class="text-center text-primary">Create a new Room</h2>
                 <p class="text-muted text-center">Generate a room from scratch</p>
@@ -45,24 +45,24 @@
                         <input type="date" name="expirationDate" id="expiration-date" class="form-control" required />
                     </div>
 
+                    <!-- Error message -->
+                    <div id="create-room-error" class="alert alert-danger d-none" role="alert"></div>
+
                     <button type="submit" class="btn btn-primary w-100">Create Room</button>
                 </form>
             </div>
         </div>
 
         <!-- ROOM VIEW -->
-        <div id="room" class="container-fluid" hidden>
-            <!-- Left Sidebar Panel -->
-            <div id="control-panel" class="d-flex flex-column" hidden>
-                <!-- Commands -->
-                <div class="section">
-                    <h5>Commands</h5>
-                    <button id="end-meeting-btn" class="btn btn-danger">End Meeting</button>
-                </div>
+        <div id="room" hidden>
+            <!-- Header section with room name and end meeting button (only visible for moderators) -->
+            <div id="room-header" class="border-bottom border-primary bg-light px-3 shadow-sm">
+                <h4 id="room-name-header" class="text-primary fw-semibold m-0">Room Name</h4>
+                <button id="end-meeting-btn" class="btn btn-danger btn-sm d-none">End Meeting</button>
             </div>
 
-            <!-- Main Content Section -->
-            <div id="main-content" class="d-flex flex-column">
+            <!-- Main content section -->
+            <div id="main-content">
                 <!-- Web Component Section -->
                 <div id="meeting-container"></div>
             </div>

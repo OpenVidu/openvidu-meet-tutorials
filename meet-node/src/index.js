@@ -31,6 +31,12 @@ app.post('/rooms', async (req, res) => {
         // Extract values from request body
         const { roomName, expirationDate } = req.body;
 
+        // Check if the room name already exists
+        if (roomNameToMeetRoomMap.has(roomName)) {
+            res.status(400).json({ message: 'Room name already exists' });
+            return;
+        }
+
         // Request to create a new MeetRoom
         const room = await httpRequest('POST', 'rooms', {
             roomIdPrefix: roomName,
@@ -53,19 +59,6 @@ app.post('/rooms', async (req, res) => {
 app.get('/rooms', (_req, res) => {
     const rooms = Array.from(roomNameToMeetRoomMap.values());
     res.status(200).json({ rooms });
-});
-
-// Get room details
-app.get('/rooms/:roomName', (req, res) => {
-    const { roomName } = req.params;
-
-    const room = roomNameToMeetRoomMap.get(roomName);
-    if (!room) {
-        res.status(404).json({ message: 'Room not found' });
-        return;
-    }
-
-    res.status(200).json({ room });
 });
 
 // Receive webhook events
@@ -93,7 +86,7 @@ const httpRequest = async (method, path, body) => {
     const responseBody = await response.json();
 
     if (!response.ok) {
-        throw new Error('Failed to fetch data from OpenVidu Meet API: ' + responseBody.errorMessage);
+        throw new Error('Failed to fetch data from OpenVidu Meet API: ' + responseBody.message);
     }
 
     return responseBody;

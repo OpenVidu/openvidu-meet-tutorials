@@ -4,6 +4,8 @@
         <title>OpenVidu Meet Tutorial</title>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+
         <!-- Bootstrap -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="css/styles.css" />
@@ -13,40 +15,40 @@
         <!-- HOME VIEW -->
         <div id="home" class="container">
             <!-- Rooms list section -->
-            <div class="rooms-container">
-                <div class="rooms-header">
+            <div id="rooms-container">
+                <div id="rooms-header">
                     <h2 class="text-center text-primary">Join a Room</h2>
-                    <p class="text-muted text-center">Join to an existing room</p>
                 </div>
 
-                <div class="rooms-list"></div>
+                <div id="rooms-list">
+                    <!-- Message when there are no rooms or an error occurs while loading -->
+                    <p id="no-rooms-or-error" class="text-muted text-center" hidden></p>
+
+                    <ul class="list-group">
+                        <!-- Rooms will be dynamically added here -->
+                    </ul>
+                </div>
             </div>
 
             <!-- Create room section -->
-            <div class="create-room">
-                <h2 class="text-center text-primary">Create a new Room</h2>
-                <p class="text-muted text-center">Generate a room from scratch</p>
+            <div id="create-room">
+                <h2 class="text-center text-primary">Create a New Room</h2>
 
                 <form onsubmit="createRoom(); return false;">
                     <div class="mb-3">
-                        <label for="room-name" class="form-label">Room Name</label>
+                        <label for="room-name" class="form-label">Room name</label>
                         <input
                             type="text"
                             name="roomName"
                             id="room-name"
                             class="form-control"
-                            placeholder="e.g. Team meeting"
+                            placeholder="Example Room"
                             required
                         />
                     </div>
 
-                    <div class="mb-3">
-                        <label for="expiration-date" class="form-label">Expiration Date</label>
-                        <input type="date" name="expirationDate" id="expiration-date" class="form-control" required />
-                    </div>
-
                     <!-- Error message -->
-                    <div id="create-room-error" class="alert alert-danger d-none" role="alert"></div>
+                    <div id="create-room-error" class="alert alert-danger" hidden></div>
 
                     <button type="submit" class="btn btn-primary w-100">Create Room</button>
                 </form>
@@ -57,14 +59,12 @@
         <div id="room" hidden>
             <!-- Header section with room name and end meeting button (only visible for moderators) -->
             <div id="room-header" class="border-bottom border-primary bg-light px-3 shadow-sm">
-                <h4 id="room-name-header" class="text-primary fw-semibold m-0">Room Name</h4>
-                <button id="end-meeting-btn" class="btn btn-danger btn-sm d-none">End Meeting</button>
+                <h4 id="room-name-header" class="text-primary fw-semibold m-0"></h4>
+                <button id="end-meeting-btn" class="btn btn-danger btn-sm" hidden>End Meeting</button>
             </div>
 
-            <!-- Main content section -->
-            <div id="main-content">
-                <!-- Web Component Section -->
-                <div id="meeting-container"></div>
+            <div id="meeting-container">
+                <!-- Here will be the OpenVidu Meet webcomponent -->
             </div>
         </div>
 

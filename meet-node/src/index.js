@@ -22,33 +22,42 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Map to store room names and their corresponding MeetRoom objects
-const roomNameToMeetRoomMap = new Map();
+// OpenVidu Meet rooms indexed by name
+const rooms = new Map();
 
 // Create a new room
 app.post('/rooms', async (req, res) => {
     try {
-        // Extract values from request body
-        const { roomName, expirationDate } = req.body;
+        const { roomName } = req.body;
 
         // Check if the room name already exists
-        if (roomNameToMeetRoomMap.has(roomName)) {
+        if (rooms.has(roomName)) {
             res.status(400).json({ message: 'Room name already exists' });
             return;
         }
 
-        // Request to create a new MeetRoom
+        // Create a new OpenVidu Meet room using the API
         const room = await httpRequest('POST', 'rooms', {
             roomIdPrefix: roomName,
-            expirationDate: new Date(expirationDate).getTime()
+            preferences: {
+                chatPreferences: {
+                    enabled: true // Enable chat for this room
+                },
+                recordingPreferences: {
+                    enabled: false // Disable recording for this room
+                },
+                virtualBackgroundPreferences: {
+                    enabled: true // Enable virtual background for this room
+                }
+            }
         });
 
-        // Store the room name and MeetRoom object in the map
+        // Add the room name to the OpenVidu Meet room object for easier access
         room.name = roomName;
-        roomNameToMeetRoomMap.set(roomName, room);
 
         console.log('Room created:', room);
-        res.status(200).json({ message: 'Room created successfully', room });
+        rooms.set(roomName, room);
+        res.status(201).json({ message: 'Room created successfully', room });
     } catch (error) {
         console.error('Room creation error:', error);
         res.status(500).json({ message: 'Error creating new room' });
@@ -57,14 +66,31 @@ app.post('/rooms', async (req, res) => {
 
 // List all rooms
 app.get('/rooms', (_req, res) => {
-    const rooms = Array.from(roomNameToMeetRoomMap.values());
-    res.status(200).json({ rooms });
+    const roomsArray = Array.from(rooms.values());
+    res.status(200).json({ rooms: roomsArray });
 });
 
-// Receive webhook events
-app.post('/webhook', (req, res) => {
-    console.log('Webhook received:', req.body);
-    res.status(200).send('Webhook received');
+// Delete a room
+app.delete('/rooms/:roomName', async (req, res) => {
+    try {
+        const { roomName } = req.params;
+
+        // Check if the room exists
+        const room = rooms.get(roomName);
+        if (!room) {
+            res.status(404).json({ message: 'Room not found' });
+            return;
+        }
+
+        // Delete the OpenVidu Meet room using the API
+        await httpRequest('DELETE', `rooms/${room.roomId}`);
+
+        rooms.delete(roomName);
+        res.status(200).json({ message: 'Room deleted successfully' });
+    } catch (error) {
+        console.error('Room deletion error:', error);
+        res.status(500).json({ message: 'Error deleting room' });
+    }
 });
 
 // Start the server
@@ -80,8 +106,13 @@ const httpRequest = async (method, path, body) => {
             'Content-Type': 'application/json',
             'X-API-KEY': OV_MEET_API_KEY // Include the API key in the header for authentication
         },
-        body: method !== 'GET' ? JSON.stringify(body) : undefined
+        body: body ? JSON.stringify(body) : undefined
     });
+
+    // Check if the response status is 204 (No Content)
+    if (response.status === 204) {
+        return;
+    }
 
     const responseBody = await response.json();
 

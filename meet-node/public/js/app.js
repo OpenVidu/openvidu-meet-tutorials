@@ -1,156 +1,167 @@
-document.addEventListener('DOMContentLoaded', async function () {
-    const roomsListContainer = document.querySelector('.rooms-list');
-    const homeScreen = document.querySelector('#home');
-    const roomScreen = document.querySelector('#room');
+const rooms = new Map();
 
-    async function fetchRooms() {
-        try {
-            const { rooms } = await httpRequest('GET', '/rooms');
-            renderRooms(rooms);
-        } catch (error) {
-            console.error('Error fetching rooms:', error);
-            roomsListContainer.innerHTML = '<p class="text-muted text-center">Error loading rooms</p>';
-        }
-    }
-
-    function renderRooms(rooms) {
-        if (rooms.length === 0) {
-            roomsListContainer.innerHTML = '<p class="text-muted text-center">No rooms available</p>';
-            return;
-        }
-
-        const ul = document.createElement('ul');
-        ul.classList.add('list-group');
-
-        rooms.forEach((room) => {
-            const li = createRoomListItem(room);
-            ul.appendChild(li);
-        });
-
-        roomsListContainer.innerHTML = '';
-        roomsListContainer.appendChild(ul);
-    }
-
-    function createRoomListItem(room) {
-        const li = document.createElement('li');
-        li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
-
-        li.innerHTML = `
-            <span>${room.name}</span>
-            <div class="dropdown">
-                <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    Join as
-                </button>
-                <ul class="dropdown-menu">
-                    <li>
-                        <form onsubmit="joinRoom(event, '${room.name}', '${room.moderatorRoomUrl}', 'moderator');">
-                            <button type="submit" class="dropdown-item">Moderator</button>
-                        </form>
-                    </li>
-                    <li>
-                        <form onsubmit="joinRoom(event, '${room.name}', '${room.publisherRoomUrl}', 'publisher');">
-                            <button type="submit" class="dropdown-item">Publisher</button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
-        `;
-        return li;
-    }
-
-    window.createRoom = async function () {
-        const createRoomForm = document.querySelector('.create-room form');
-        const roomName = document.querySelector('#room-name').value;
-        const expirationDate = document.querySelector('#expiration-date').value;
-        const errorDiv = document.querySelector('#create-room-error');
-
-        // Clear previous error message
-        errorDiv.classList.add('d-none');
-        errorDiv.textContent = '';
-
-        try {
-            const { room: newRoom } = await httpRequest('POST', '/rooms', {
-                roomName,
-                expirationDate
-            });
-
-            // Add new room to the list
-            const ul = roomsListContainer.querySelector('ul') || document.createElement('ul');
-            ul.classList.add('list-group');
-            ul.appendChild(createRoomListItem(newRoom));
-
-            roomsListContainer.innerHTML = '';
-            roomsListContainer.appendChild(ul);
-
-            // Reset the form
-            createRoomForm.reset();
-        } catch (error) {
-            console.error('Error creating room:', error);
-            errorDiv.classList.remove('d-none');
-
-            if (error.message.includes('already exists')) {
-                errorDiv.textContent = 'Room name already exists';
-            } else {
-                errorDiv.textContent = 'Error creating room';
-            }
-        }
-    };
-
-    window.joinRoom = function (event, roomName, roomUrl, role) {
-        event.preventDefault();
-        console.log(`Joining room as ${role}`);
-
-        const endMeetingButton = document.querySelector('#end-meeting-btn');
-        const meetingContainer = document.querySelector('#meeting-container');
-
-        // Set the room name in the header
-        const roomNameHeader = document.querySelector('#room-name-header');
-        roomNameHeader.textContent = roomName;
-
-        // Show end meeting button only for moderators
-        if (role === 'moderator') {
-            endMeetingButton.classList.remove('d-none');
-        } else {
-            endMeetingButton.classList.add('d-none');
-        }
-
-        // Inject the OpenVidu Meet component into the meeting container specifying the room URL
-        meetingContainer.innerHTML = `
-            <openvidu-meet 
-                room-url="${roomUrl}">
-            </openvidu-meet>
-        `;
-
-        // Add event listeners for the OpenVidu Meet component
-        const meet = document.querySelector('openvidu-meet');
-
-        // Event listener for when the local participant left the room
-        meet.addEventListener('left', () => {
-            console.log('Local participant left the room');
-
-            // Hide the room screen and show the home screen
-            homeScreen.hidden = false;
-            roomScreen.hidden = true;
-
-            // Reset the meeting container
-            meetingContainer.innerHTML = '';
-        });
-
-        // Event listener for ending the meeting
-        if (role === 'moderator') {
-            endMeetingButton.addEventListener('click', () => {
-                console.log('Ending meeting');
-                meet.endMeeting();
-            });
-        }
-
-        // Hide the home screen and show the room screen
-        homeScreen.hidden = true;
-        roomScreen.hidden = false;
-    };
-
-    fetchRooms();
+document.addEventListener('DOMContentLoaded', async () => {
+    await fetchRooms();
 });
+
+async function fetchRooms() {
+    try {
+        const { rooms: roomsList } = await httpRequest('GET', '/rooms');
+
+        roomsList.forEach((room) => {
+            rooms.set(room.name, room);
+        });
+        renderRooms();
+    } catch (error) {
+        console.error('Error fetching rooms:', error);
+
+        // Show error message
+        const roomsErrorElement = document.querySelector('#no-rooms-or-error');
+        roomsErrorElement.textContent = 'Error loading rooms';
+        roomsErrorElement.hidden = false;
+    }
+}
+
+function renderRooms() {
+    // Clear the previous list of rooms
+    const roomsList = document.querySelector('#rooms-list ul');
+    roomsList.innerHTML = '';
+
+    // Show or remove the "No rooms found" message
+    const noRoomsElement = document.querySelector('#no-rooms-or-error');
+    if (rooms.size === 0) {
+        noRoomsElement.textContent = 'No rooms found. Please create a new room.';
+        noRoomsElement.hidden = false;
+        return;
+    } else {
+        noRoomsElement.textContent = '';
+        noRoomsElement.hidden = true;
+    }
+
+    // Add rooms to the list element
+    Array.from(rooms.values()).forEach((room) => {
+        const roomItem = getRoomListItemTemplate(room);
+        roomsList.innerHTML += roomItem;
+    });
+}
+
+function getRoomListItemTemplate(room) {
+    return `
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>${room.name}</span>
+            <div class="room-actions">
+                <button class="btn btn-primary btn-sm" onclick="joinRoom('${room.name}', '${room.moderatorRoomUrl}', 'moderator');">
+                    Join as Moderator
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="joinRoom('${room.name}', '${room.publisherRoomUrl}', 'publisher');">
+                    Join as Publisher
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="deleteRoom('${room.name}');">
+                    Delete Room
+                </button>
+            </div>
+        </li>
+    `;
+}
+
+async function createRoom() {
+    // Clear previous error message
+    const errorDiv = document.querySelector('#create-room-error');
+    errorDiv.textContent = '';
+    errorDiv.hidden = true;
+
+    try {
+        const roomName = document.querySelector('#room-name').value;
+
+        const { room } = await httpRequest('POST', '/rooms', {
+            roomName
+        });
+
+        // Add new room to the list
+        rooms.set(roomName, room);
+        renderRooms();
+
+        // Reset the form
+        const createRoomForm = document.querySelector('#create-room form');
+        createRoomForm.reset();
+    } catch (error) {
+        console.error('Error creating room:', error);
+
+        // Show error message
+        if (error.message.includes('already exists')) {
+            errorDiv.textContent = 'Room name already exists';
+        } else {
+            errorDiv.textContent = 'Error creating room';
+        }
+
+        errorDiv.hidden = false;
+    }
+}
+
+async function deleteRoom(roomName) {
+    try {
+        await httpRequest('DELETE', `/rooms/${roomName}`);
+
+        // Remove the room from the list
+        rooms.delete(roomName);
+        renderRooms();
+    } catch (error) {
+        console.error('Error deleting room:', error);
+    }
+}
+
+function joinRoom(roomName, roomUrl, role) {
+    console.log(`Joining room as ${role}`);
+
+    // Hide the home screen and show the room screen
+    const homeScreen = document.querySelector('#home');
+    homeScreen.hidden = true;
+    const roomScreen = document.querySelector('#room');
+    roomScreen.hidden = false;
+
+    // Set the room name in the header
+    const roomNameHeader = document.querySelector('#room-name-header');
+    roomNameHeader.textContent = roomName;
+
+    // Show end meeting button only for moderators
+    const endMeetingButton = document.querySelector('#end-meeting-btn');
+    if (role === 'moderator') {
+        endMeetingButton.hidden = false;
+    } else {
+        endMeetingButton.hidden = true;
+    }
+
+    // Inject the OpenVidu Meet component into the meeting container specifying the room URL
+    const meetingContainer = document.querySelector('#meeting-container');
+    meetingContainer.innerHTML = `
+        <openvidu-meet 
+            room-url="${roomUrl}">
+        </openvidu-meet>
+    `;
+
+    // Add event listeners for the OpenVidu Meet component
+
+    // Event listener for when the local participant left the room
+    const meet = document.querySelector('openvidu-meet');
+    meet.addEventListener('left', () => {
+        console.log('Local participant left the room');
+
+        // Hide the room screen and show the home screen
+        homeScreen.hidden = false;
+        roomScreen.hidden = true;
+
+        // Reset the meeting container
+        meetingContainer.innerHTML = '';
+    });
+
+    // Event listener for ending the meeting
+    if (role === 'moderator') {
+        endMeetingButton.addEventListener('click', () => {
+            console.log('Ending meeting');
+            meet.endMeeting();
+        });
+    }
+}
 
 // Function to make HTTP requests to the backend
 async function httpRequest(method, path, body) {
@@ -159,7 +170,7 @@ async function httpRequest(method, path, body) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: method !== 'GET' ? JSON.stringify(body) : undefined
+        body: body ? JSON.stringify(body) : undefined
     });
 
     const responseBody = await response.json();

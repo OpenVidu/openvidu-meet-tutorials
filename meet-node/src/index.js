@@ -9,6 +9,8 @@ dotenv.config();
 
 // Configuration
 const SERVER_PORT = process.env.SERVER_PORT || 5080;
+const OV_MEET_WEBCOMPONENT_URL =
+    process.env.OV_MEET_WEB_COMPONENT_URL || 'http://localhost:6080/meet/v1/openvidu-meet.js';
 const OV_MEET_URL = process.env.OV_MEET_URL || 'http://localhost:6080/meet/api/v1';
 const OV_MEET_API_KEY = process.env.OV_MEET_API_KEY || 'meet-api-key';
 
@@ -24,6 +26,13 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // OpenVidu Meet rooms indexed by name
 const rooms = new Map();
+
+// Get the OpenVidu Meet WebComponent URL
+app.get('/config', (_req, res) => {
+    res.status(200).json({
+        ovMeetWebcomponentUrl: OV_MEET_WEBCOMPONENT_URL
+    });
+});
 
 // Create a new room
 app.post('/rooms', async (req, res) => {

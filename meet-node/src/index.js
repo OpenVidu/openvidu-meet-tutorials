@@ -9,9 +9,9 @@ dotenv.config();
 
 // Configuration
 const SERVER_PORT = process.env.SERVER_PORT || 5080;
-const OV_MEET_WEBCOMPONENT_URL =
-    process.env.OV_MEET_WEB_COMPONENT_URL || 'http://localhost:6080/meet/v1/openvidu-meet.js';
-const OV_MEET_URL = process.env.OV_MEET_URL || 'http://localhost:6080/meet/api/v1';
+const OV_MEET_SERVER_URL = process.env.OV_MEET_SERVER_URL || 'http://localhost:6080';
+const OV_MEET_WEBCOMPONENT_URL = `${OV_MEET_SERVER_URL}/meet/v1/openvidu-meet.js`;
+const OV_MEET_API_URL = `${OV_MEET_SERVER_URL}/meet/api/v1`;
 const OV_MEET_API_KEY = process.env.OV_MEET_API_KEY || 'meet-api-key';
 
 const app = express();
@@ -38,6 +38,11 @@ app.get('/config', (_req, res) => {
 app.post('/rooms', async (req, res) => {
     try {
         const { roomName } = req.body;
+
+        if (!roomName) {
+            res.status(400).json({ message: 'Room name is required' });
+            return;
+        }
 
         // Check if the room name already exists
         if (rooms.has(roomName)) {
@@ -109,7 +114,7 @@ app.listen(SERVER_PORT, () => {
 
 // Function to make HTTP requests to OpenVidu Meet API
 const httpRequest = async (method, path, body) => {
-    const response = await fetch(`${OV_MEET_URL}/${path}`, {
+    const response = await fetch(`${OV_MEET_API_URL}/${path}`, {
         method,
         headers: {
             'Content-Type': 'application/json',

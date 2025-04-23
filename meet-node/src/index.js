@@ -10,8 +10,6 @@ dotenv.config();
 // Configuration
 const SERVER_PORT = process.env.SERVER_PORT || 5080;
 const OV_MEET_SERVER_URL = process.env.OV_MEET_SERVER_URL || 'http://localhost:6080';
-const OV_MEET_WEBCOMPONENT_URL = `${OV_MEET_SERVER_URL}/meet/v1/openvidu-meet.js`;
-const OV_MEET_API_URL = `${OV_MEET_SERVER_URL}/meet/api/v1`;
 const OV_MEET_API_KEY = process.env.OV_MEET_API_KEY || 'meet-api-key';
 
 const app = express();
@@ -26,13 +24,6 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // OpenVidu Meet rooms indexed by name
 const rooms = new Map();
-
-// Get the OpenVidu Meet WebComponent URL
-app.get('/config', (_req, res) => {
-    res.status(200).json({
-        ovMeetWebcomponentUrl: OV_MEET_WEBCOMPONENT_URL
-    });
-});
 
 // Create a new room
 app.post('/rooms', async (req, res) => {
@@ -114,7 +105,7 @@ app.listen(SERVER_PORT, () => {
 
 // Function to make HTTP requests to OpenVidu Meet API
 const httpRequest = async (method, path, body) => {
-    const response = await fetch(`${OV_MEET_API_URL}/${path}`, {
+    const response = await fetch(`${OV_MEET_SERVER_URL}/meet/api/v1/${path}`, {
         method,
         headers: {
             'Content-Type': 'application/json',

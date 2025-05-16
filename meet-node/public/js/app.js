@@ -140,18 +140,18 @@ function joinRoom(roomName, roomUrl, role) {
     `;
 
     // Add event listeners for the OpenVidu Meet component
-
-    // Event listener for when the local participant left the room
     const meet = document.querySelector('openvidu-meet');
-    meet.addEventListener('left', () => {
+
+    // Event listener for when the local participant leaves the room
+    meet.addEventListener('LEFT', (event) => {
         console.log('Local participant left the room');
+        displayDisconnectedScreen(event.detail.reason);
+    });
 
-        // Hide the room screen and show the home screen
-        homeScreen.hidden = false;
-        roomScreen.hidden = true;
-
-        // Reset the meeting container
-        meetingContainer.innerHTML = '';
+    // Event listener for when the meeting ends
+    meet.addEventListener('MEETING_ENDED', () => {
+        console.log('Meeting ended');
+        displayDisconnectedScreen('meeting-ended');
     });
 
     // Event listener for ending the meeting
@@ -161,6 +161,53 @@ function joinRoom(roomName, roomUrl, role) {
             meet.endMeeting();
         });
     }
+}
+
+function displayDisconnectedScreen(reason) {
+    // Hide the room screen and show the disconnected screen
+    const roomScreen = document.querySelector('#room');
+    roomScreen.hidden = true;
+    const disconnectedScreen = document.querySelector('#disconnected');
+    disconnectedScreen.hidden = false;
+
+    // Set the disconnected screen message and reason
+    const disconnectedMessage = document.querySelector('#disconnected-title');
+    const disconnectedReason = document.querySelector('#disconnected-reason');
+    const participantLeft = reason === 'LEAVE';
+
+    if (participantLeft) {
+        disconnectedMessage.textContent = 'You have left the meeting';
+        disconnectedReason.hidden = true;
+    } else {
+        disconnectedMessage.textContent = 'You have been disconnected from the meeting';
+        disconnectedReason.hidden = false;
+
+        let reasonText;
+        switch (reason) {
+            case 'meeting-ended':
+                reasonText = 'The meeting has ended';
+                break;
+            case 'participant_removed':
+                reasonText = 'A moderator removed you from the meeting';
+                break;
+            default:
+                reasonText = 'Connection problem';
+        }
+
+        disconnectedReason.textContent = `Reason: ${reasonText}`;
+    }
+
+    // Reset the meeting container
+    const meetingContainer = document.querySelector('#meeting-container');
+    meetingContainer.innerHTML = '';
+
+    // Return to the home screen
+    const homeButton = document.querySelector('#home-btn');
+    homeButton.addEventListener('click', () => {
+        disconnectedScreen.hidden = true;
+        const homeScreen = document.querySelector('#home');
+        homeScreen.hidden = false;
+    });
 }
 
 // Function to make HTTP requests to the backend

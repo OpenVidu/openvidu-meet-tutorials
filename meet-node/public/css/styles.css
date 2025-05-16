@@ -14,7 +14,7 @@ html {
     background-color: #f8f9fa;
 }
 
-/* HOME PAGE STYLES */
+/* HOME VIEW STYLES */
 .container {
     width: 100%;
     max-width: 1000px;
@@ -65,7 +65,7 @@ html {
     background-color: #357abd;
 }
 
-/* ROOM PAGE STYLES */
+/* ROOM VIEW STYLES */
 #room {
     height: 100vh;
     width: 100vw;
@@ -113,4 +113,23 @@ html {
     width: 100%;
     height: 100%;
     display: block;
+}
+
+/* DISCONNECTED VIEW STYLES */
+#disconnected {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+}
+
+#disconnected > div {
+    max-width: 500px;
+    padding: 30px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }

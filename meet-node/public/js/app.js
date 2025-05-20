@@ -143,13 +143,13 @@ function joinRoom(roomName, roomUrl, role) {
     const meet = document.querySelector('openvidu-meet');
 
     // Event listener for when the local participant leaves the room
-    meet.addEventListener('LEFT', (event) => {
+    meet.once('LEFT', (event) => {
         console.log('Local participant left the room');
-        displayDisconnectedScreen(event.detail.reason);
+        displayDisconnectedScreen(event.reason);
     });
 
     // Event listener for when the meeting ends
-    meet.addEventListener('MEETING_ENDED', () => {
+    meet.once('MEETING_ENDED', () => {
         console.log('Meeting ended');
         displayDisconnectedScreen('meeting-ended');
     });

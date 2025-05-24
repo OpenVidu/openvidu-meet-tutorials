@@ -49,7 +49,8 @@ app.post('/rooms', async (req, res) => {
                     enabled: true // Enable chat for this room
                 },
                 recordingPreferences: {
-                    enabled: false // Disable recording for this room
+                    enabled: true, // Enable recording for this room
+                    allowAccessTo: 'admin-moderator-publisher' // Allow access to recordings for admin, moderator and publisher roles
                 },
                 virtualBackgroundPreferences: {
                     enabled: true // Enable virtual background for this room

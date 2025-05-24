@@ -48,6 +48,29 @@ html {
     max-height: 100%;
 }
 
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.room-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.join-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.join-buttons {
+    display: flex;
+    gap: 8px;
+}
+
 #create-room {
     flex: 1;
     background: var(--secondary-color);

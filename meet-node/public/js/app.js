@@ -47,18 +47,42 @@ function renderRooms() {
 
 function getRoomListItemTemplate(room) {
     return `
-        <li class="list-group-item d-flex justify-content-between align-items-center">
+        <li class="list-group-item">
             <span>${room.name}</span>
             <div class="room-actions">
-                <button class="btn btn-primary btn-sm" onclick="joinRoom('${room.name}', '${room.moderatorRoomUrl}', 'moderator');">
-                    Join as Moderator
-                </button>
-                <button class="btn btn-secondary btn-sm" onclick="joinRoom('${room.name}', '${room.publisherRoomUrl}', 'publisher');">
-                    Join as Publisher
-                </button>
-                <button class="btn btn-danger btn-sm" onclick="deleteRoom('${room.name}');">
-                    Delete Room
-                </button>
+                <div class="join-actions">
+                    <div class="join-buttons mb-2">
+                        <button
+                            class="btn btn-primary btn-sm"
+                            onclick="joinRoom(
+                                '${room.name}', 
+                                '${room.moderatorRoomUrl}', 
+                                'moderator', 
+                                document.getElementById('recordings-only-${room.name}').checked
+                            );"
+                        >
+                            Join as Moderator
+                        </button>
+                        <button
+                            class="btn btn-secondary btn-sm"
+                            onclick="joinRoom(
+                                '${room.name}', 
+                                '${room.publisherRoomUrl}', 
+                                'publisher',
+                                document.getElementById('recordings-only-${room.name}').checked
+                            );"
+                        >
+                            Join as Publisher
+                        </button>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="recordings-only-${room.name}" />
+                        <label class="form-check-label" for="recordings-only-${room.name}">
+                            Show only recordings
+                        </label>
+                    </div>
+                </div>
+                <button class="btn btn-danger btn-sm" onclick="deleteRoom('${room.name}');">Delete Room</button>
             </div>
         </li>
     `;
@@ -110,7 +134,7 @@ async function deleteRoom(roomName) {
     }
 }
 
-function joinRoom(roomName, roomUrl, role) {
+function joinRoom(roomName, roomUrl, role, recordingsOnly) {
     console.log(`Joining room as ${role}`);
 
     // Hide the home screen and show the room screen
@@ -123,9 +147,9 @@ function joinRoom(roomName, roomUrl, role) {
     const roomNameHeader = document.querySelector('#room-name-header');
     roomNameHeader.textContent = roomName;
 
-    // Show end meeting button only for moderators
+    // Show end meeting button only for moderators if not in recordings-only mode
     const endMeetingButton = document.querySelector('#end-meeting-btn');
-    if (role === 'moderator') {
+    if (role === 'moderator' && !recordingsOnly) {
         endMeetingButton.hidden = false;
     } else {
         endMeetingButton.hidden = true;
@@ -135,7 +159,9 @@ function joinRoom(roomName, roomUrl, role) {
     const meetingContainer = document.querySelector('#meeting-container');
     meetingContainer.innerHTML = `
         <openvidu-meet 
-            room-url="${roomUrl}">
+            room-url="${roomUrl}"
+            ${recordingsOnly ? 'view-recordings="true"' : ''}
+        >
         </openvidu-meet>
     `;
 
@@ -155,7 +181,7 @@ function joinRoom(roomName, roomUrl, role) {
     });
 
     // Event listener for ending the meeting
-    if (role === 'moderator') {
+    if (role === 'moderator' && !recordingsOnly) {
         endMeetingButton.addEventListener('click', () => {
             console.log('Ending meeting');
             meet.endMeeting();

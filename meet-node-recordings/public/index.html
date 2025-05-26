@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <title>OpenVidu Meet Tutorial</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+        <link rel="stylesheet" href="css/styles.css" />
+    </head>
+    <body>
+        <!-- HOME VIEW -->
+        <div id="home" class="container">
+            <!-- Rooms list section -->
+            <div id="rooms-container">
+                <div id="rooms-header">
+                    <h2 class="text-center text-primary">Join a Room</h2>
+                </div>
+
+                <div id="rooms-list">
+                    <!-- Message when there are no rooms or an error occurs while loading -->
+                    <p id="no-rooms-or-error" class="text-muted text-center" hidden></p>
+
+                    <ul class="list-group">
+                        <!-- Rooms will be dynamically added here -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Create room section -->
+            <div id="create-room">
+                <h2 class="text-center text-primary">Create a New Room</h2>
+
+                <form onsubmit="createRoom(); return false;">
+                    <div class="mb-3">
+                        <label for="room-name" class="form-label">Room name</label>
+                        <input
+                            type="text"
+                            name="roomName"
+                            id="room-name"
+                            class="form-control"
+                            placeholder="Example Room"
+                            required
+                        />
+                    </div>
+
+                    <!-- Error message -->
+                    <div id="create-room-error" class="alert alert-danger" hidden></div>
+
+                    <button type="submit" class="btn btn-primary w-100">Create Room</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ROOM VIEW -->
+        <div id="room" hidden>
+            <!-- Header section with room name and end meeting button (only visible for moderators) -->
+            <div id="room-header" class="border-bottom border-primary bg-light px-3 shadow-sm">
+                <h4 id="room-name-header" class="text-primary fw-semibold m-0"></h4>
+                <button id="end-meeting-btn" class="btn btn-danger btn-sm" hidden>End Meeting</button>
+            </div>
+
+            <div id="meeting-container">
+                <!-- The OpenVidu Meet WebComponent will be inserted here when user joins a room -->
+                <!-- <openvidu-meet room-url="..."></openvidu-meet>-->
+            </div>
+        </div>
+
+        <!-- DISCONNECTED VIEW -->
+        <div id="disconnected" hidden>
+            <div>
+                <h2 id="disconnected-title" class="text-primary"></h2>
+                <p id="disconnected-reason" class="text-muted"></p>
+                <p class="text-muted">Thank you for participating!</p>
+                <button id="home-btn" class="btn btn-primary mt-3">Return to Home</button>
+            </div>
+        </div>
+
+        <!-- RECORDINGS VIEW -->
+        <div id="recordings" hidden>
+            <div id="recordings-actions">
+                <button id="refresh-recordings" title="Refresh" class="icon-button" onclick="listRecordings()">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <form id="filter-by-room" onsubmit="listRecordings(); return false">
+                    <input id="recordings-room-search" type="text" placeholder="Room name" />
+                    <button title="Search" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+
+            <h2>Recordings</h2>
+            <div id="recordings-list">
+                <!-- Message when there are no recordings or an error occurs while loading -->
+                <p id="no-recordings-or-error" class="text-muted text-center" hidden></p>
+
+                <ul class="list-group">
+                    <!-- Recordings will be dynamically added here -->
+                </ul>
+            </div>
+            <dialog id="recording-video-dialog">
+                <video id="recording-video" autoplay controls></video>
+                <button class="btn btn-secondary" id="close-recording" onclick="closeRecording()">Close</button>
+            </dialog>
+        </div>
+
+        <script src="js/app.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- OpenVidu Meet WebComponent bundle -->
+        <script src="http://localhost:6080/meet/v1/openvidu-meet.js"></script>
+    </body>
+</html>

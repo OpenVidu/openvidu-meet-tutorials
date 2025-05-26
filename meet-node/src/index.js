@@ -123,7 +123,7 @@ const httpRequest = async (method, path, body) => {
     const responseBody = await response.json();
 
     if (!response.ok) {
-        throw new Error('Failed to fetch data from OpenVidu Meet API: ' + responseBody.message);
+        throw new Error('Failed to perform request to OpenVidu Meet API: ' + responseBody.message);
     }
 
     return responseBody;

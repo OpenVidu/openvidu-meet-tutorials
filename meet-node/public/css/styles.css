@@ -5,7 +5,7 @@
 
 body,
 html {
-    height: 100vh;
+    height: 100dvh;
     margin: 0;
     width: 100%;
     display: flex;
@@ -60,6 +60,29 @@ html {
     gap: 12px;
 }
 
+.icon-button {
+    background-color: transparent;
+    border: none;
+    color: #333;
+    margin-left: 10px;
+    padding: 4px 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.icon-button:hover {
+    background-color: #e0e0e0;
+}
+
+.delete-button {
+    color: #d9534f;
+}
+
 .join-actions {
     display: flex;
     flex-direction: column;
@@ -90,8 +113,8 @@ html {
 
 /* ROOM VIEW STYLES */
 #room {
-    height: 100vh;
-    width: 100vw;
+    height: 100dvh;
+    width: 100dvw;
     display: flex;
     flex-direction: column;
     padding: 0;
@@ -140,8 +163,8 @@ html {
 
 /* DISCONNECTED VIEW STYLES */
 #disconnected {
-    height: 100vh;
-    width: 100vw;
+    height: 100dvh;
+    width: 100dvw;
     display: flex;
     justify-content: center;
     align-items: center;

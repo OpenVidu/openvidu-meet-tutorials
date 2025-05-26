@@ -82,7 +82,9 @@ function getRoomListItemTemplate(room) {
                         </label>
                     </div>
                 </div>
-                <button class="btn btn-danger btn-sm" onclick="deleteRoom('${room.name}');">Delete Room</button>
+                <button title="Delete room" class="icon-button delete-button" onclick="deleteRoom('${room.name}');">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
             </div>
         </li>
     `;

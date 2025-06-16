@@ -50,7 +50,7 @@ app.post('/rooms', async (req, res) => {
                 },
                 recordingPreferences: {
                     enabled: true, // Enable recording for this room
-                    allowAccessTo: 'public' // Allow public access to recordings
+                    allowAccessTo: 'admin-moderator-publisher' // Allow access to recordings for admin, moderator and publisher roles
                 },
                 virtualBackgroundPreferences: {
                     enabled: true // Enable virtual background for this room
@@ -150,40 +150,18 @@ app.delete('/recordings/:recordingId', async (req, res) => {
     }
 });
 
-// Stream recording media
-// app.get('/recordings/:recordingId/media', async (req, res) => {
-//     const { recordingId } = req.params;
-
-//     try {
-//         // Fetch the media file for the recording
-//         const response = await fetch(`${OV_MEET_SERVER_URL}/meet/api/v1/recordings/${recordingId}/media`, {
-//             headers: {
-//                 'X-API-KEY': OV_MEET_API_KEY // Include the API key in the header for authentication
-//             }
-//         });
-
-//         if (!response.ok) {
-//             const responseBody = await response.json();
-//             throw new Error('Failed to perform request to OpenVidu Meet API: ' + responseBody.message);
-//         }
-
-//         // Set the appropriate headers for streaming
-//         res.setHeader('Content-Type', 'video/mp4');
-//         res.setHeader('Content-Disposition', `attachment; filename="${recordingId}.mp4"`);
-
-//         // Pipe the response to the client
-//         response.body.pipe(res);
-//     } catch (error) {
-//         console.error('Error fetching recording media:', error);
-//         res.status(500).json({ message: 'Error fetching recording media' });
-//     }
-// });
-
-// Get recording media URL
-app.get('/recordings/:recordingId/media', async (req, res) => {
+// Get recording URL
+app.get('/recordings/:recordingId/url', async (req, res) => {
     const { recordingId } = req.params;
-    const recordingMediaUrl = `${OV_MEET_SERVER_URL}/meet/api/v1/recordings/${recordingId}/media`;
-    res.status(200).json({ recordingMediaUrl });
+
+    try {
+        // Fetch the recording URL using OpenVidu Meet API
+        const { url } = await httpRequest('GET', `recordings/${recordingId}/url`);
+        res.status(200).json({ url });
+    } catch (error) {
+        console.error('Error fetching recording URL:', error);
+        res.status(500).json({ message: 'Error fetching recording URL' });
+    }
 });
 
 // Start the server

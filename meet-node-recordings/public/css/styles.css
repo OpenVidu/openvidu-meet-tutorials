@@ -275,22 +275,13 @@ html {
     align-items: center;
 }
 
-#recording-video-dialog {
-    width: 500px;
-    max-width: 90%;
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    background-color: #fff;
-}
-
-#recording-video {
-    width: 100%;
-    border-radius: 5px;
-}
-
-#close-recording {
-    margin-top: 10px;
-    float: right;
+/* DISPLAY RECORDING VIEW STYLES */
+#display-recording {
+    height: 100dvh;
+    width: 100dvw;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
 }

@@ -135,17 +135,9 @@ function joinRoom(roomName, roomUrl, role) {
     const roomScreen = document.querySelector('#room');
     roomScreen.hidden = false;
 
-    // Set the room name in the header
-    const roomNameHeader = document.querySelector('#room-name-header');
-    roomNameHeader.textContent = roomName;
-
-    // Show end meeting button only for moderators
-    const endMeetingButton = document.querySelector('#end-meeting-btn');
-    if (role === 'moderator') {
-        endMeetingButton.hidden = false;
-    } else {
-        endMeetingButton.hidden = true;
-    }
+    // Hide the room header until the local participant joins
+    const roomHeader = document.querySelector('#room-header');
+    roomHeader.hidden = true;
 
     // Inject the OpenVidu Meet component into the meeting container specifying the room URL
     const meetingContainer = document.querySelector('#meeting-container');
@@ -159,6 +151,32 @@ function joinRoom(roomName, roomUrl, role) {
     // Add event listeners for the OpenVidu Meet component
     const meet = document.querySelector('openvidu-meet');
 
+    // Event listener for when the local participant joins the room
+    meet.once('JOIN', () => {
+        console.log('Local participant connected to the room');
+
+        // Show the room header with the room name
+        roomHeader.hidden = false;
+        const roomNameHeader = document.querySelector('#room-name-header');
+        roomNameHeader.textContent = roomName;
+
+        // Show end meeting button only for moderators
+        const endMeetingButton = document.querySelector('#end-meeting-btn');
+        if (role === 'moderator') {
+            endMeetingButton.hidden = false;
+        } else {
+            endMeetingButton.hidden = true;
+        }
+
+        // Event listener for ending the meeting
+        if (role === 'moderator') {
+            endMeetingButton.addEventListener('click', () => {
+                console.log('Ending meeting');
+                meet.endMeeting();
+            });
+        }
+    });
+
     // Event listener for when the local participant leaves the room
     meet.once('LEFT', (event) => {
         console.log('Local participant left the room');
@@ -170,14 +188,6 @@ function joinRoom(roomName, roomUrl, role) {
         console.log('Meeting ended');
         displayDisconnectedScreen('meeting-ended');
     });
-
-    // Event listener for ending the meeting
-    if (role === 'moderator') {
-        endMeetingButton.addEventListener('click', () => {
-            console.log('Ending meeting');
-            meet.endMeeting();
-        });
-    }
 }
 
 function displayDisconnectedScreen(reason) {
@@ -247,7 +257,9 @@ async function listRecordings() {
     const recordingsUrl = '/recordings' + (roomName ? `?room=${roomName}` : '');
 
     try {
-        const { recordings: recordingsList } = await httpRequest('GET', recordingsUrl);
+        let { recordings: recordingsList } = await httpRequest('GET', recordingsUrl);
+        // Filter completed recordings
+        recordingsList = filterCompletedRecordings(recordingsList);
 
         // Clear the previous recordings and populate the new ones
         recordings.clear();
@@ -263,6 +275,10 @@ async function listRecordings() {
         recordingsErrorElement.textContent = 'Error loading recordings';
         recordingsErrorElement.hidden = false;
     }
+}
+
+function filterCompletedRecordings(recordingList) {
+    return recordingList.filter((recording) => recording.status === 'COMPLETE');
 }
 
 function renderRecordings() {
@@ -307,11 +323,6 @@ function getRecordingListItemTemplate(recording) {
     const endDate = recording.endDate ? new Date(recording.endDate).toLocaleString() : '-';
     const duration = recording.duration ? secondsToHms(recording.duration) : '-';
     const size = recording.size ? formatBytes(recording.size ?? 0) : '-';
-    const status = recording.status;
-
-    // Determine which buttons to show based on the recording status
-    const showPlayButton = status === 'COMPLETE';
-    const showDeleteButton = !['STARTING', 'ACTIVE', 'ENDING'].includes(status);
 
     return `
         <li class="recording-container">
@@ -322,60 +333,46 @@ function getRecordingListItemTemplate(recording) {
                 <p><span class="recording-info-tag">End date: </span><span class="recording-info-value">${endDate}</span></p>
                 <p><span class="recording-info-tag">Duration: </span><span class="recording-info-value">${duration}</span></p>
                 <p><span class="recording-info-tag">Size: </span><span class="recording-info-value">${size}</span></p>
-                <p><span class="recording-info-tag">Status: </span><span class="recording-info-value">${status}</span></p>
             </div>
             <div class="recording-actions">
-                ${
-                    showPlayButton
-                        ? `
                 <button title="Play" class="icon-button" onclick="displayRecording('${recordingId}')">
                     <i class="fa-solid fa-play"></i>
-                </button>`
-                        : ''
-                }
-                ${
-                    showDeleteButton
-                        ? `
+                </button>
                 <button title="Delete recording" class="icon-button delete-button" onclick="deleteRecording('${recordingId}')">
                     <i class="fa-solid fa-trash"></i>
-                </button>`
-                        : ''
-                }
+                </button>
             </div>
         </li>
     `;
 }
 
-async function displayRecording(recordingName) {
-    // Open the recording video dialog
-    const recordingVideoDialog = document.querySelector('#recording-video-dialog');
-    recordingVideoDialog.showModal();
+async function displayRecording(recordingId) {
+    // Hide the recordings screen and show the display recording screen
+    const recordingsScreen = document.querySelector('#recordings');
+    recordingsScreen.hidden = true;
+    const displayRecordingScreen = document.querySelector('#display-recording');
+    displayRecordingScreen.hidden = false;
 
     // Get the recording media URL and set it to the source of the video element
-    const recordingUrl = await getRecordingMediaUrl(recordingName);
-    const recordingVideo = document.querySelector('#recording-video');
-    recordingVideo.src = recordingUrl;
+    const recordingUrl = await getRecordingUrl(recordingId);
+
+    // Inject the OpenVidu Meet component into the display recording container specifying the recording URL
+    displayRecordingScreen.innerHTML = `
+        <openvidu-meet 
+            recording-url="${recordingUrl}"
+        >
+        </openvidu-meet>
+    `;
 }
 
-async function getRecordingMediaUrl(recordingId) {
+async function getRecordingUrl(recordingId) {
     try {
-        const { recordingMediaUrl } = await httpRequest('GET', `/recordings/${recordingId}/media`);
-        return recordingMediaUrl;
+        const { url } = await httpRequest('GET', `/recordings/${recordingId}/url`);
+        return url;
     } catch (error) {
-        console.error('Error fetching recording media URL:', error);
+        console.error('Error fetching recording URL:', error);
         return null;
     }
-}
-
-function closeRecording() {
-    // Stop the video playback
-    const recordingVideo = document.querySelector('#recording-video');
-    recordingVideo.pause();
-    recordingVideo.src = '';
-
-    // Close the recording video dialog
-    const recordingVideoDialog = document.querySelector('#recording-video-dialog');
-    recordingVideoDialog.close();
 }
 
 async function deleteRecording(recordingId) {

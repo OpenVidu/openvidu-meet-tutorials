@@ -50,38 +50,26 @@ function getRoomListItemTemplate(room) {
         <li class="list-group-item">
             <span>${room.name}</span>
             <div class="room-actions">
-                <div class="join-actions">
-                    <div class="join-buttons mb-2">
-                        <button
-                            class="btn btn-primary btn-sm"
-                            onclick="joinRoom(
-                                '${room.name}', 
-                                '${room.moderatorRoomUrl}', 
-                                'moderator', 
-                                document.getElementById('recordings-only-${room.name}').checked
-                            );"
-                        >
-                            Join as Moderator
-                        </button>
-                        <button
-                            class="btn btn-secondary btn-sm"
-                            onclick="joinRoom(
-                                '${room.name}', 
-                                '${room.publisherRoomUrl}', 
-                                'publisher',
-                                document.getElementById('recordings-only-${room.name}').checked
-                            );"
-                        >
-                            Join as Publisher
-                        </button>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="recordings-only-${room.name}" />
-                        <label class="form-check-label" for="recordings-only-${room.name}">
-                            Show only recordings
-                        </label>
-                    </div>
-                </div>
+                <button
+                    class="btn btn-primary btn-sm"
+                    onclick="joinRoom(
+                        '${room.name}', 
+                        '${room.moderatorRoomUrl}', 
+                        'moderator'
+                    );"
+                >
+                    Join as Moderator
+                </button>
+                <button
+                    class="btn btn-secondary btn-sm"
+                    onclick="joinRoom(
+                        '${room.name}', 
+                        '${room.publisherRoomUrl}', 
+                        'publisher',
+                    );"
+                >
+                    Join as Publisher
+                </button>
                 <button title="Delete room" class="icon-button delete-button" onclick="deleteRoom('${room.name}');">
                     <i class="fa-solid fa-trash"></i>
                 </button>
@@ -136,7 +124,7 @@ async function deleteRoom(roomName) {
     }
 }
 
-function joinRoom(roomName, roomUrl, role, recordingsOnly) {
+function joinRoom(roomName, roomUrl, role) {
     console.log(`Joining room as ${role}`);
 
     // Hide the home screen and show the room screen
@@ -145,30 +133,47 @@ function joinRoom(roomName, roomUrl, role, recordingsOnly) {
     const roomScreen = document.querySelector('#room');
     roomScreen.hidden = false;
 
-    // Set the room name in the header
-    const roomNameHeader = document.querySelector('#room-name-header');
-    roomNameHeader.textContent = roomName;
-
-    // Show end meeting button only for moderators if not in recordings-only mode
-    const endMeetingButton = document.querySelector('#end-meeting-btn');
-    if (role === 'moderator' && !recordingsOnly) {
-        endMeetingButton.hidden = false;
-    } else {
-        endMeetingButton.hidden = true;
-    }
+    // Hide the room header until the local participant joins
+    const roomHeader = document.querySelector('#room-header');
+    roomHeader.hidden = true;
 
     // Inject the OpenVidu Meet component into the meeting container specifying the room URL
     const meetingContainer = document.querySelector('#meeting-container');
     meetingContainer.innerHTML = `
         <openvidu-meet 
             room-url="${roomUrl}"
-            ${recordingsOnly ? 'view-recordings="true"' : ''}
         >
         </openvidu-meet>
     `;
 
     // Add event listeners for the OpenVidu Meet component
     const meet = document.querySelector('openvidu-meet');
+
+    // Event listener for when the local participant joins the room
+    meet.once('JOIN', () => {
+        console.log('Local participant connected to the room');
+
+        // Show the room header with the room name
+        roomHeader.hidden = false;
+        const roomNameHeader = document.querySelector('#room-name-header');
+        roomNameHeader.textContent = roomName;
+
+        // Show end meeting button only for moderators
+        const endMeetingButton = document.querySelector('#end-meeting-btn');
+        if (role === 'moderator') {
+            endMeetingButton.hidden = false;
+        } else {
+            endMeetingButton.hidden = true;
+        }
+
+        // Event listener for ending the meeting
+        if (role === 'moderator') {
+            endMeetingButton.addEventListener('click', () => {
+                console.log('Ending meeting');
+                meet.endMeeting();
+            });
+        }
+    });
 
     // Event listener for when the local participant leaves the room
     meet.once('LEFT', (event) => {
@@ -181,14 +186,6 @@ function joinRoom(roomName, roomUrl, role, recordingsOnly) {
         console.log('Meeting ended');
         displayDisconnectedScreen('meeting-ended');
     });
-
-    // Event listener for ending the meeting
-    if (role === 'moderator' && !recordingsOnly) {
-        endMeetingButton.addEventListener('click', () => {
-            console.log('Ending meeting');
-            meet.endMeeting();
-        });
-    }
 }
 
 function displayDisconnectedScreen(reason) {

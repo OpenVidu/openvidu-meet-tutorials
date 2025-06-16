@@ -83,17 +83,6 @@ html {
     color: #d9534f;
 }
 
-.join-actions {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.join-buttons {
-    display: flex;
-    gap: 8px;
-}
-
 #create-room {
     flex: 1;
     background: var(--secondary-color);

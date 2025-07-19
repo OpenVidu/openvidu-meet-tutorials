@@ -9,7 +9,7 @@ This is a simple example of how to integrate OpenVidu Meet into a Node.js applic
 ## Run
 
 > [!NOTE]
-> Before running the application, you must also run [OpenVidu Local Deployment](https://github.com/OpenVidu/openvidu-local-deployment) and [OpenVidu Meet](https://github.com/OpenVidu/openvidu-meet).
+> Before running the application, you must also run [OpenVidu Local Deployment](https://github.com/OpenVidu/openvidu-local-deployment).
 
 1. Download repository
 

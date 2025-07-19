@@ -149,22 +149,3 @@ html {
     height: 100%;
     display: block;
 }
-
-/* DISCONNECTED VIEW STYLES */
-#disconnected {
-    height: 100dvh;
-    width: 100dvw;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #f8f9fa;
-}
-
-#disconnected > div {
-    max-width: 500px;
-    padding: 30px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}

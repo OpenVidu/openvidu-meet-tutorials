@@ -150,8 +150,8 @@ function joinRoom(roomName, roomUrl, role) {
     const meet = document.querySelector('openvidu-meet');
 
     // Event listener for when the local participant joins the room
-    meet.once('JOIN', () => {
-        console.log('Local participant connected to the room');
+    meet.once('JOINED', () => {
+        console.log('Local participant joined the room');
 
         // Show the room header with the room name
         roomHeader.hidden = false;
@@ -177,60 +177,18 @@ function joinRoom(roomName, roomUrl, role) {
 
     // Event listener for when the local participant leaves the room
     meet.once('LEFT', (event) => {
-        console.log('Local participant left the room');
-        displayDisconnectedScreen(event.reason);
+        console.log('Local participant left the room. Reason:', event.reason);
+
+        // Hide the room header
+        roomHeader.hidden = true;
     });
 
-    // Event listener for when the meeting ends
-    meet.once('MEETING_ENDED', () => {
-        console.log('Meeting ended');
-        displayDisconnectedScreen('meeting-ended');
-    });
-}
+    // Event listener for when the OpenVidu Meet component is closed
+    meet.once('CLOSED', () => {
+        console.log('OpenVidu Meet component closed');
 
-function displayDisconnectedScreen(reason) {
-    // Hide the room screen and show the disconnected screen
-    const roomScreen = document.querySelector('#room');
-    roomScreen.hidden = true;
-    const disconnectedScreen = document.querySelector('#disconnected');
-    disconnectedScreen.hidden = false;
-
-    // Set the disconnected screen message and reason
-    const disconnectedMessage = document.querySelector('#disconnected-title');
-    const disconnectedReason = document.querySelector('#disconnected-reason');
-    const participantLeft = reason === 'LEAVE';
-
-    if (participantLeft) {
-        disconnectedMessage.textContent = 'You have left the meeting';
-        disconnectedReason.hidden = true;
-    } else {
-        disconnectedMessage.textContent = 'You have been disconnected from the meeting';
-        disconnectedReason.hidden = false;
-
-        let reasonText;
-        switch (reason) {
-            case 'meeting-ended':
-                reasonText = 'The meeting has ended';
-                break;
-            case 'participant_removed':
-                reasonText = 'A moderator removed you from the meeting';
-                break;
-            default:
-                reasonText = 'Connection problem';
-        }
-
-        disconnectedReason.textContent = `Reason: ${reasonText}`;
-    }
-
-    // Reset the meeting container
-    const meetingContainer = document.querySelector('#meeting-container');
-    meetingContainer.innerHTML = '';
-
-    // Return to the home screen
-    const homeButton = document.querySelector('#home-btn');
-    homeButton.addEventListener('click', () => {
-        disconnectedScreen.hidden = true;
-        const homeScreen = document.querySelector('#home');
+        // Hide the room screen and show the home screen
+        roomScreen.hidden = true;
         homeScreen.hidden = false;
     });
 }

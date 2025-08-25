@@ -10,7 +10,7 @@ async function fetchRooms() {
         const { rooms: roomsList } = await httpRequest('GET', '/rooms');
 
         roomsList.forEach((room) => {
-            rooms.set(room.name, room);
+            rooms.set(room.roomName, room);
         });
         renderRooms();
     } catch (error) {
@@ -49,13 +49,13 @@ function renderRooms() {
 function getRoomListItemTemplate(room) {
     return `
         <li class="list-group-item">
-            <span>${room.name}</span>
+            <span>${room.roomName}</span>
             <div class="room-actions">
                 <button
                     class="btn btn-primary btn-sm"
                     onclick="joinRoom(
-                        '${room.name}', 
-                        '${room.moderatorRoomUrl}', 
+                        '${room.roomName}', 
+                        '${room.moderatorUrl}', 
                         'moderator'
                     );"
                 >
@@ -64,15 +64,15 @@ function getRoomListItemTemplate(room) {
                 <button
                     class="btn btn-secondary btn-sm"
                     onclick="joinRoom(
-                        '${room.name}', 
-                        '${room.publisherRoomUrl}', 
-                        'publisher'
+                        '${room.roomName}', 
+                        '${room.speakerUrl}', 
+                        'speaker'
                     );"
                 >
-                    Join as Publisher
+                    Join as Speaker
                 </button>
-                <button class="btn btn-success btn-sm" onclick="listRecordingsByRoom('${room.name}');">View Recordings</button>
-                <button title="Delete room" class="icon-button delete-button" onclick="deleteRoom('${room.name}');">
+                <button class="btn btn-success btn-sm" onclick="listRecordingsByRoom('${room.roomName}');">View Recordings</button>
+                <button title="Delete room" class="icon-button delete-button" onclick="deleteRoom('${room.roomName}');">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             </div>
@@ -358,7 +358,7 @@ async function httpRequest(method, path, body) {
     const responseBody = await response.json();
 
     if (!response.ok) {
-        throw new Error('Failed to fetch data from backend: ' + responseBody.message);
+        throw new Error('Failed to perform request to backend: ' + responseBody.message);
     }
 
     return responseBody;

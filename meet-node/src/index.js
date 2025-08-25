@@ -27,30 +27,30 @@ const rooms = new Map();
 
 // Create a new room
 app.post('/rooms', async (req, res) => {
+    const { roomName } = req.body;
+
+    if (!roomName) {
+        res.status(400).json({ message: `'roomName' is required` });
+        return;
+    }
+
+    // Check if the room name already exists
+    if (rooms.has(roomName)) {
+        res.status(400).json({ message: `Room '${roomName}' already exists` });
+        return;
+    }
+
     try {
-        const { roomName } = req.body;
-
-        if (!roomName) {
-            res.status(400).json({ message: 'Room name is required' });
-            return;
-        }
-
-        // Check if the room name already exists
-        if (rooms.has(roomName)) {
-            res.status(400).json({ message: 'Room name already exists' });
-            return;
-        }
-
         // Create a new OpenVidu Meet room using the API
         const room = await httpRequest('POST', 'rooms', {
-            roomIdPrefix: roomName,
+            roomName,
             preferences: {
                 chatPreferences: {
                     enabled: true // Enable chat for this room
                 },
                 recordingPreferences: {
                     enabled: true, // Enable recording for this room
-                    allowAccessTo: 'admin-moderator-publisher' // Allow access to recordings for admin, moderator and publisher roles
+                    allowAccessTo: 'admin-moderator-speaker' // Allow access to recordings for admin, moderator and speaker roles
                 },
                 virtualBackgroundPreferences: {
                     enabled: true // Enable virtual background for this room
@@ -58,15 +58,12 @@ app.post('/rooms', async (req, res) => {
             }
         });
 
-        // Add the room name to the OpenVidu Meet room object for easier access
-        room.name = roomName;
-
         console.log('Room created:', room);
         rooms.set(roomName, room);
-        res.status(201).json({ message: 'Room created successfully', room });
+        res.status(201).json({ message: `Room '${roomName}' created successfully`, room });
     } catch (error) {
-        console.error('Room creation error:', error);
-        res.status(500).json({ message: 'Error creating new room' });
+        console.error(`Error while creating room '${roomName}':`, error);
+        res.status(500).json({ message: `Error creating room '${roomName}'` });
     }
 });
 
@@ -78,24 +75,24 @@ app.get('/rooms', (_req, res) => {
 
 // Delete a room
 app.delete('/rooms/:roomName', async (req, res) => {
+    const { roomName } = req.params;
+
+    // Check if the room exists
+    const room = rooms.get(roomName);
+    if (!room) {
+        res.status(404).json({ message: `Room '${roomName}' not found` });
+        return;
+    }
+
     try {
-        const { roomName } = req.params;
-
-        // Check if the room exists
-        const room = rooms.get(roomName);
-        if (!room) {
-            res.status(404).json({ message: 'Room not found' });
-            return;
-        }
-
         // Delete the OpenVidu Meet room using the API
         await httpRequest('DELETE', `rooms/${room.roomId}`);
 
         rooms.delete(roomName);
-        res.status(200).json({ message: 'Room deleted successfully' });
+        res.status(200).json({ message: `Room '${roomName}' deleted successfully` });
     } catch (error) {
-        console.error('Room deletion error:', error);
-        res.status(500).json({ message: 'Error deleting room' });
+        console.error(`Error while deleting room '${roomName}':`, error);
+        res.status(500).json({ message: `Error deleting room '${roomName}'` });
     }
 });
 
@@ -123,7 +120,8 @@ const httpRequest = async (method, path, body) => {
     const responseBody = await response.json();
 
     if (!response.ok) {
-        throw new Error('Failed to perform request to OpenVidu Meet API: ' + responseBody.message);
+        console.error('Error while performing request to OpenVidu Meet API:', responseBody);
+        throw new Error('Failed to perform request to OpenVidu Meet API');
     }
 
     return responseBody;

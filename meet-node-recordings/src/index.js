@@ -177,11 +177,6 @@ const httpRequest = async (method, path, body) => {
         body: body ? JSON.stringify(body) : undefined
     });
 
-    // Check if the response status is 204 (No Content)
-    if (response.status === 204) {
-        return;
-    }
-
     const responseBody = await response.json();
 
     if (!response.ok) {

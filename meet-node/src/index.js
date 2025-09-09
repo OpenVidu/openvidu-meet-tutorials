@@ -44,15 +44,15 @@ app.post('/rooms', async (req, res) => {
         // Create a new OpenVidu Meet room using the API
         const room = await httpRequest('POST', 'rooms', {
             roomName,
-            preferences: {
-                chatPreferences: {
+            config: {
+                chatConfig: {
                     enabled: true // Enable chat for this room
                 },
-                recordingPreferences: {
+                recordingConfig: {
                     enabled: true, // Enable recording for this room
-                    allowAccessTo: 'admin-moderator-speaker' // Allow access to recordings for admin, moderator and speaker roles
+                    allowAccessTo: 'admin_moderator_speaker' // Allow access to recordings for admin, moderator and speaker roles
                 },
-                virtualBackgroundPreferences: {
+                virtualBackgroundConfig: {
                     enabled: true // Enable virtual background for this room
                 }
             }

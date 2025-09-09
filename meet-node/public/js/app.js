@@ -150,7 +150,7 @@ function joinRoom(roomName, roomUrl, role) {
     const meet = document.querySelector('openvidu-meet');
 
     // Event listener for when the local participant joins the room
-    meet.once('JOINED', () => {
+    meet.once('joined', () => {
         console.log('Local participant joined the room');
 
         // Show the room header with the room name
@@ -176,7 +176,7 @@ function joinRoom(roomName, roomUrl, role) {
     });
 
     // Event listener for when the local participant leaves the room
-    meet.once('LEFT', (event) => {
+    meet.once('left', (event) => {
         console.log('Local participant left the room. Reason:', event.reason);
 
         // Hide the room header
@@ -184,7 +184,7 @@ function joinRoom(roomName, roomUrl, role) {
     });
 
     // Event listener for when the OpenVidu Meet component is closed
-    meet.once('CLOSED', () => {
+    meet.once('closed', () => {
         console.log('OpenVidu Meet component closed');
 
         // Hide the room screen and show the home screen

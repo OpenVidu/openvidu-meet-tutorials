@@ -1,6 +1,6 @@
-# OpenVidu Meet Node.js Example
+# OpenVidu Meet WebComponent with Commands and Events
 
-This is a simple example of how to integrate OpenVidu Meet into a Node.js application. It is built using Node.js and Express for the backend and plain HTML/CSS/JavaScript for the frontend.
+This is a more advanced example of how to integrate OpenVidu Meet into a Node.js application using its WebComponent and managing commands and events. It is built using Node.js and Express for the backend and plain HTML/CSS/JavaScript for the frontend.
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ This is a simple example of how to integrate OpenVidu Meet into a Node.js applic
 
 ```bash
 git clone https://github.com/OpenVidu/openvidu-meet-tutorials.git
-cd openvidu-meet-tutorials/meet-node
+cd openvidu-meet-tutorials/meet-webcomponent-commands-events
 ```
 
 2. Install dependencies

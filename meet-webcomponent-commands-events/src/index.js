@@ -45,6 +45,7 @@ app.post('/rooms', async (req, res) => {
         const room = await httpRequest('POST', 'rooms', {
             roomName,
             config: {
+                // Default room configuration
                 chatConfig: {
                     enabled: true // Enable chat for this room
                 },

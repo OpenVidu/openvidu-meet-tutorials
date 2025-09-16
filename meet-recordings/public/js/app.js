@@ -71,8 +71,17 @@ function getRoomListItemTemplate(room) {
                 >
                     Join as Speaker
                 </button>
-                <button class="btn btn-success btn-sm" onclick="listRecordingsByRoom('${room.roomName}');">View Recordings</button>
-                <button title="Delete room" class="icon-button delete-button" onclick="deleteRoom('${room.roomName}');">
+                <button 
+                    class="btn btn-success btn-sm" 
+                    onclick="listRecordingsByRoom('${room.roomName}');"
+                >
+                    View Recordings
+                </button>
+                <button 
+                    title="Delete room"
+                    class="icon-button delete-button"
+                    onclick="deleteRoom('${room.roomName}');"
+                >
                     <i class="fa-solid fa-trash"></i>
                 </button>
             </div>

@@ -53,8 +53,7 @@ app.post('/rooms', async (req, res) => {
         console.log('Room created:', room);
         res.status(201).json({ message: `Room '${roomName}' created successfully`, room });
     } catch (error) {
-        console.error(`Error while creating room '${roomName}':`, error);
-        res.status(500).json({ message: `Error creating room '${roomName}'` });
+        handleApiError(res, error, `Error creating room '${roomName}'`);
     }
 });
 
@@ -65,8 +64,7 @@ app.get('/rooms', async (_req, res) => {
         const { rooms } = await httpRequest('GET', 'rooms');
         res.status(200).json({ rooms });
     } catch (error) {
-        console.error('Error while fetching rooms:', error);
-        res.status(500).json({ message: 'Error fetching rooms' });
+        handleApiError(res, error, 'Error fetching rooms');
     }
 });
 
@@ -79,8 +77,7 @@ app.delete('/rooms/:roomId', async (req, res) => {
         await httpRequest('DELETE', `rooms/${roomId}`);
         res.status(200).json({ message: `Room '${roomId}' deleted successfully` });
     } catch (error) {
-        console.error(`Error while deleting room '${roomId}':`, error);
-        res.status(500).json({ message: `Error deleting room '${roomId}'` });
+        handleApiError(res, error, `Error deleting room '${roomId}'`);
     }
 });
 
@@ -104,8 +101,19 @@ const httpRequest = async (method, path, body) => {
 
     if (!response.ok) {
         console.error('Error while performing request to OpenVidu Meet API:', responseBody);
-        throw new Error('Failed to perform request to OpenVidu Meet API');
+        // Create an error object that includes the HTTP status code from the API
+        const error = new Error(responseBody.message || 'Failed to perform request to OpenVidu Meet API');
+        error.statusCode = response.status;
+        throw error;
     }
 
     return responseBody;
+};
+
+// Helper function to handle API errors consistently
+const handleApiError = (res, error, message) => {
+    console.error(`${message}: ${error.message}`);
+    const statusCode = error.statusCode || 500;
+    const errorMessage = error.statusCode ? error.message : message;
+    res.status(statusCode).json({ message: errorMessage });
 };

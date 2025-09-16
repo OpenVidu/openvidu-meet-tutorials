@@ -62,8 +62,7 @@ app.post('/rooms', async (req, res) => {
         rooms.set(roomName, room);
         res.status(201).json({ message: `Room '${roomName}' created successfully`, room });
     } catch (error) {
-        console.error(`Error while creating room '${roomName}':`, error);
-        res.status(500).json({ message: `Error creating room '${roomName}'` });
+        handleApiError(res, error, `Error creating room '${roomName}'`);
     }
 });
 
@@ -91,8 +90,7 @@ app.delete('/rooms/:roomName', async (req, res) => {
         rooms.delete(roomName);
         res.status(200).json({ message: `Room '${roomName}' deleted successfully` });
     } catch (error) {
-        console.error(`Error while deleting room '${roomName}':`, error);
-        res.status(500).json({ message: `Error deleting room '${roomName}'` });
+        handleApiError(res, error, `Error deleting room '${roomName}'`);
     }
 });
 
@@ -128,8 +126,7 @@ app.get('/recordings', async (req, res) => {
 
         res.status(200).json({ recordings });
     } catch (error) {
-        console.error('Error while fetching recordings:', error);
-        res.status(500).json({ message: 'Error fetching recordings' });
+        handleApiError(res, error, 'Error fetching recordings');
     }
 });
 
@@ -142,8 +139,7 @@ app.delete('/recordings/:recordingId', async (req, res) => {
         await httpRequest('DELETE', `recordings/${recordingId}`);
         res.status(200).json({ message: `Recording '${recordingId}' deleted successfully` });
     } catch (error) {
-        console.error(`Error while deleting recording '${recordingId}':`, error);
-        res.status(500).json({ message: `Error deleting recording '${recordingId}'` });
+        handleApiError(res, error, `Error deleting recording '${recordingId}'`);
     }
 });
 
@@ -156,8 +152,7 @@ app.get('/recordings/:recordingId/url', async (req, res) => {
         const { url } = await httpRequest('GET', `recordings/${recordingId}/url`);
         res.status(200).json({ url });
     } catch (error) {
-        console.error(`Error while fetching recording URL for '${recordingId}':`, error);
-        res.status(500).json({ message: `Error fetching recording URL for '${recordingId}'` });
+        handleApiError(res, error, `Error fetching URL for recording '${recordingId}'`);
     }
 });
 
@@ -181,8 +176,19 @@ const httpRequest = async (method, path, body) => {
 
     if (!response.ok) {
         console.error('Error while performing request to OpenVidu Meet API:', responseBody);
-        throw new Error('Failed to perform request to OpenVidu Meet API');
+        // Create an error object that includes the HTTP status code from the API
+        const error = new Error(responseBody.message || 'Failed to perform request to OpenVidu Meet API');
+        error.statusCode = response.status;
+        throw error;
     }
 
     return responseBody;
+};
+
+// Helper function to handle API errors consistently
+const handleApiError = (res, error, message) => {
+    console.error(`${message}: ${error.message}`);
+    const statusCode = error.statusCode || 500;
+    const errorMessage = error.statusCode ? error.message : message;
+    res.status(statusCode).json({ message: errorMessage });
 };

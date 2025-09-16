@@ -13,7 +13,7 @@ async function fetchRooms() {
         });
         renderRooms();
     } catch (error) {
-        console.error('Error fetching rooms:', error);
+        console.error('Error fetching rooms:', error.message);
 
         // Show error message
         const roomsErrorElement = document.querySelector('#no-rooms-or-error');
@@ -99,7 +99,7 @@ async function createRoom() {
         const createRoomForm = document.querySelector('#create-room form');
         createRoomForm.reset();
     } catch (error) {
-        console.error('Error creating room:', error);
+        console.error('Error creating room:', error.message);
 
         // Show error message
         if (error.message.includes('already exists')) {
@@ -120,7 +120,7 @@ async function deleteRoom(roomName) {
         rooms.delete(roomName);
         renderRooms();
     } catch (error) {
-        console.error('Error deleting room:', error);
+        console.error('Error deleting room:', error.message);
     }
 }
 
@@ -206,7 +206,7 @@ async function httpRequest(method, path, body) {
     const responseBody = await response.json();
 
     if (!response.ok) {
-        throw new Error('Failed to perform request to backend: ' + responseBody.message);
+        throw new Error(responseBody.message || 'Failed to perform request to backend');
     }
 
     return responseBody;

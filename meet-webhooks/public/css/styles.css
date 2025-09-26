@@ -1,0 +1,268 @@
+:root {
+    --primary-color: #4a90e2;
+    --secondary-color: #f4f4f4;
+}
+
+body,
+html {
+    height: 100dvh;
+    margin: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+}
+
+/* HOME VIEW STYLES */
+.container {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    gap: 25px;
+    max-height: 450px;
+}
+
+#rooms-container {
+    flex: 2;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+#rooms-header {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+#rooms-list {
+    overflow-y: auto;
+    height: 100%;
+    max-height: 100%;
+}
+
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.room-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.icon-button {
+    background-color: transparent;
+    border: none;
+    color: #333;
+    margin-left: 10px;
+    padding: 4px 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.icon-button:hover {
+    background-color: #e0e0e0;
+}
+
+.delete-button {
+    color: #d9534f;
+}
+
+#create-room {
+    flex: 1;
+    background: var(--secondary-color);
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #357abd;
+}
+
+/* ROOM VIEW STYLES */
+#room {
+    height: 100dvh;
+    width: 100dvw;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+#room-header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 10;
+}
+
+#room-name-header {
+    flex: 1;
+    text-align: center;
+    font-size: 1.5rem;
+    letter-spacing: 0.5px;
+}
+
+#end-meeting-btn {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#meeting-container {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#meeting-container openvidu-meet {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* RECORDINGS VIEW STYLES */
+#recordings {
+    height: 100dvh;
+    width: 100dvw;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#recordings h2 {
+    width: 100%;
+    max-width: 1000px;
+    margin-bottom: 20px;
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+    color: #444;
+}
+
+#recordings-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 1000px;
+    margin-bottom: 20px;
+}
+
+#refresh-recordings {
+    margin: 0;
+    padding: 8px 13px;
+}
+
+#filter-by-room input {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px 0 0 5px;
+}
+
+#filter-by-room button {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-left: none;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 0 5px 5px 0;
+}
+
+#filter-by-room button:hover {
+    background-color: #0056b3;
+}
+
+#recordings-list {
+    width: 600px;
+    max-width: 100%;
+}
+
+.recording-container {
+    display: flex;
+    align-items: center;
+    border: 1px solid #dcdcdc;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #f4f4f4;
+    margin: 5px;
+}
+
+.fa-file-video {
+    font-size: 30px;
+    color: #333;
+    margin-right: 10px;
+}
+
+.recording-info {
+    flex-grow: 1;
+    font-size: 14px;
+    color: #333;
+}
+
+.recording-info p {
+    margin: 0;
+}
+
+.recording-name {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.recording-info-tag {
+    font-weight: bold;
+}
+
+.recording-info-value {
+    color: #777;
+}
+
+.recording-actions {
+    display: flex;
+    align-items: center;
+}
+
+/* DISPLAY RECORDING VIEW STYLES */
+#display-recording {
+    height: 100dvh;
+    width: 100dvw;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}

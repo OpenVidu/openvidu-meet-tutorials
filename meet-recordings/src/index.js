@@ -22,21 +22,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, '../public')));
 
-// OpenVidu Meet rooms indexed by name
-const rooms = new Map();
-
 // Create a new room
 app.post('/rooms', async (req, res) => {
     const { roomName } = req.body;
 
     if (!roomName) {
         res.status(400).json({ message: `'roomName' is required` });
-        return;
-    }
-
-    // Check if the room name already exists
-    if (rooms.has(roomName)) {
-        res.status(400).json({ message: `Room '${roomName}' already exists` });
         return;
     }
 
@@ -60,7 +51,6 @@ app.post('/rooms', async (req, res) => {
         });
 
         console.log('Room created:', room);
-        rooms.set(roomName, room);
         res.status(201).json({ message: `Room '${roomName}' created successfully`, room });
     } catch (error) {
         handleApiError(res, error, `Error creating room '${roomName}'`);
@@ -68,63 +58,42 @@ app.post('/rooms', async (req, res) => {
 });
 
 // List all rooms
-app.get('/rooms', (_req, res) => {
-    const roomsArray = Array.from(rooms.values());
-    res.status(200).json({ rooms: roomsArray });
+app.get('/rooms', async (_req, res) => {
+    try {
+        // List all OpenVidu Meet rooms using the API (100 max)
+        const { rooms } = await httpRequest('GET', 'rooms?maxItems=100');
+        res.status(200).json({ rooms });
+    } catch (error) {
+        handleApiError(res, error, 'Error fetching rooms');
+    }
 });
 
 // Delete a room
-app.delete('/rooms/:roomName', async (req, res) => {
-    const { roomName } = req.params;
-
-    // Check if the room exists
-    const room = rooms.get(roomName);
-    if (!room) {
-        res.status(404).json({ message: `Room '${roomName}' not found` });
-        return;
-    }
+app.delete('/rooms/:roomId', async (req, res) => {
+    const { roomId } = req.params;
 
     try {
         // Delete the OpenVidu Meet room using the API
-        await httpRequest('DELETE', `rooms/${room.roomId}`);
-
-        rooms.delete(roomName);
-        res.status(200).json({ message: `Room '${roomName}' deleted successfully` });
+        await httpRequest('DELETE', `rooms/${roomId}`);
+        res.status(200).json({ message: `Room '${roomId}' deleted successfully` });
     } catch (error) {
-        handleApiError(res, error, `Error deleting room '${roomName}'`);
+        handleApiError(res, error, `Error deleting room '${roomId}'`);
     }
 });
 
 // List all recordings
 app.get('/recordings', async (req, res) => {
-    const { room: roomName } = req.query;
-    const roomsArray = [];
+    // Create the base path for recordings, including maxItems parameter
+    let recordingsPath = `recordings?maxItems=100`;
 
+    const { room: roomName } = req.query;
     if (roomName) {
         // If a room is specified, filter recordings by room
-        // Check if the room exists
-        const room = rooms.get(roomName);
-        if (!room) {
-            res.status(404).json({ message: 'Room not found' });
-            return;
-        }
-
-        roomsArray.push(room);
-    } else {
-        // If no room is specified, fetch recordings from all rooms
-        roomsArray.push(...Array.from(rooms.values()));
+        recordingsPath += `&roomId=${roomName}`;
     }
 
-    const recordings = [];
-
     try {
-        // Fetch recordings for each room
-        for (const room of roomsArray) {
-            const recordingsUrl = `recordings?maxItems=100&roomId=${room.roomId}`;
-            const { recordings: roomRecordings } = await httpRequest('GET', recordingsUrl);
-            recordings.push(...roomRecordings);
-        }
-
+        const { recordings } = await httpRequest('GET', recordingsPath);
         res.status(200).json({ recordings });
     } catch (error) {
         handleApiError(res, error, 'Error fetching recordings');

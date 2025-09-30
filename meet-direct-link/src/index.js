@@ -60,8 +60,8 @@ app.post('/rooms', async (req, res) => {
 // List all rooms
 app.get('/rooms', async (_req, res) => {
     try {
-        // List all OpenVidu Meet rooms using the API
-        const { rooms } = await httpRequest('GET', 'rooms');
+        // List all OpenVidu Meet rooms using the API (100 max)
+        const { rooms } = await httpRequest('GET', 'rooms?maxItems=100');
         res.status(200).json({ rooms });
     } catch (error) {
         handleApiError(res, error, 'Error fetching rooms');

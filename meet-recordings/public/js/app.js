@@ -10,7 +10,7 @@ async function fetchRooms() {
         const { rooms: roomsList } = await httpRequest('GET', '/rooms');
 
         roomsList.forEach((room) => {
-            rooms.set(room.roomName, room);
+            rooms.set(room.roomId, room);
         });
         renderRooms();
     } catch (error) {
@@ -80,7 +80,7 @@ function getRoomListItemTemplate(room) {
                 <button 
                     title="Delete room"
                     class="icon-button delete-button"
-                    onclick="deleteRoom('${room.roomName}');"
+                    onclick="deleteRoom('${room.roomId}');"
                 >
                     <i class="fa-solid fa-trash"></i>
                 </button>
@@ -113,22 +113,17 @@ async function createRoom() {
         console.error('Error creating room:', error.message);
 
         // Show error message
-        if (error.message.includes('already exists')) {
-            errorDiv.textContent = 'Room name already exists';
-        } else {
-            errorDiv.textContent = 'Error creating room';
-        }
-
+        errorDiv.textContent = 'Error creating room';
         errorDiv.hidden = false;
     }
 }
 
-async function deleteRoom(roomName) {
+async function deleteRoom(roomId) {
     try {
-        await httpRequest('DELETE', `/rooms/${roomName}`);
+        await httpRequest('DELETE', `/rooms/${roomId}`);
 
         // Remove the room from the list
-        rooms.delete(roomName);
+        rooms.delete(roomId);
         renderRooms();
     } catch (error) {
         console.error('Error deleting room:', error.message);
@@ -285,9 +280,8 @@ function sortRecordingsByDate(recordings) {
 
 function getRecordingListItemTemplate(recording) {
     const recordingId = recording.recordingId;
-    const name = recording.filename;
+    const roomName = recording.roomName;
     const startDate = recording.startDate ? new Date(recording.startDate).toLocaleString() : '-';
-    const endDate = recording.endDate ? new Date(recording.endDate).toLocaleString() : '-';
     const duration = recording.duration ? secondsToHms(recording.duration) : '-';
     const size = recording.size ? formatBytes(recording.size ?? 0) : '-';
 
@@ -295,9 +289,8 @@ function getRecordingListItemTemplate(recording) {
         <li class="recording-container">
             <i class="fa-solid fa-file-video"></i>
             <div class="recording-info">
-                <p class="recording-name">${name}</p>
+                <p class="recording-name">${roomName}</p>
                 <p><span class="recording-info-tag">Start date: </span><span class="recording-info-value">${startDate}</span></p>
-                <p><span class="recording-info-tag">End date: </span><span class="recording-info-value">${endDate}</span></p>
                 <p><span class="recording-info-tag">Duration: </span><span class="recording-info-value">${duration}</span></p>
                 <p><span class="recording-info-tag">Size: </span><span class="recording-info-value">${size}</span></p>
             </div>

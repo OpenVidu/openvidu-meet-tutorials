@@ -9,7 +9,7 @@ async function fetchRooms() {
         const { rooms: roomsList } = await httpRequest('GET', '/rooms');
 
         roomsList.forEach((room) => {
-            rooms.set(room.roomName, room);
+            rooms.set(room.roomId, room);
         });
         renderRooms();
     } catch (error) {
@@ -73,7 +73,7 @@ function getRoomListItemTemplate(room) {
                 <button 
                     title="Delete room"
                     class="icon-button delete-button"
-                    onclick="deleteRoom('${room.roomName}');"
+                    onclick="deleteRoom('${room.roomId}');"
                 >
                     <i class="fa-solid fa-trash"></i>
                 </button>
@@ -106,22 +106,17 @@ async function createRoom() {
         console.error('Error creating room:', error.message);
 
         // Show error message
-        if (error.message.includes('already exists')) {
-            errorDiv.textContent = 'Room name already exists';
-        } else {
-            errorDiv.textContent = 'Error creating room';
-        }
-
+        errorDiv.textContent = 'Error creating room';
         errorDiv.hidden = false;
     }
 }
 
-async function deleteRoom(roomName) {
+async function deleteRoom(roomId) {
     try {
-        await httpRequest('DELETE', `/rooms/${roomName}`);
+        await httpRequest('DELETE', `/rooms/${roomId}`);
 
         // Remove the room from the list
-        rooms.delete(roomName);
+        rooms.delete(roomId);
         renderRooms();
     } catch (error) {
         console.error('Error deleting room:', error.message);

@@ -49,15 +49,15 @@ function renderRooms() {
 }
 
 function getRoomListItemTemplate(room) {
-    const roomStatus = room.status === 'active_meeting' ? 'ACTIVE MEETING' : room.status === 'open' ? 'OPEN' : 'CLOSED';
+    const roomStatus = room.status === 'active_meeting' ? 'ACTIVE' : room.status === 'open' ? 'OPEN' : 'CLOSED';
     const roomStatusBadgeClass =
         room.status === 'active_meeting' ? 'bg-primary' : room.status === 'open' ? 'bg-success' : 'bg-warning';
 
     return `
         <li class="list-group-item">
-            <div>
+            <div class="room-info">
                 <span>${room.roomName}</span>
-                <span class="badge ${roomStatusBadgeClass} ms-2">${roomStatus}</span>
+                <span class="badge ${roomStatusBadgeClass}">${roomStatus}</span>
             </div>
             <div class="room-actions">
                 <button

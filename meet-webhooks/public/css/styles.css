@@ -54,6 +54,12 @@ html {
     align-items: center;
 }
 
+.room-info {
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+}
+
 .room-actions {
     display: flex;
     align-items: center;

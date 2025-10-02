@@ -103,7 +103,7 @@ async function createRoom() {
         });
 
         // Add new room to the list
-        rooms.set(roomName, room);
+        rooms.set(room.roomId, room);
         renderRooms();
 
         // Reset the form

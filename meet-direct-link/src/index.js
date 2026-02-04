@@ -9,7 +9,7 @@ dotenv.config();
 
 // Configuration
 const SERVER_PORT = process.env.SERVER_PORT || 6080;
-const OV_MEET_SERVER_URL = process.env.OV_MEET_SERVER_URL || 'http://localhost:9080';
+const OV_MEET_SERVER_URL = process.env.OV_MEET_SERVER_URL || 'http://localhost:9080/meet';
 const OV_MEET_API_KEY = process.env.OV_MEET_API_KEY || 'meet-api-key';
 
 const app = express();
@@ -88,6 +88,8 @@ app.listen(SERVER_PORT, () => {
 
 // Function to make HTTP requests to OpenVidu Meet API
 const httpRequest = async (method, path, body) => {
+    console.log(`Performing ${method} request to OpenVidu Meet API at path: ${path}`);
+    console.log(`${OV_MEET_SERVER_URL}/api/v1/${path}`);
     const response = await fetch(`${OV_MEET_SERVER_URL}/api/v1/${path}`, {
         method,
         headers: {

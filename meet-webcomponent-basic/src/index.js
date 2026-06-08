@@ -34,20 +34,7 @@ app.post('/rooms', async (req, res) => {
 	try {
 		// Create a new OpenVidu Meet room using the API
 		const room = await httpRequest('POST', 'rooms', {
-			roomName,
-			config: {
-				// Default room configuration
-				chat: {
-					enabled: true // Enable chat for this room
-				},
-				recording: {
-					enabled: true, // Enable recording for this room
-					allowAccessTo: 'admin_moderator_speaker' // Allow access to recordings for admin, moderator and speaker roles
-				},
-				virtualBackground: {
-					enabled: true // Enable virtual background for this room
-				}
-			}
+			roomName
 		});
 
 		console.log('Room created:', room);
@@ -74,7 +61,8 @@ app.delete('/rooms/:roomId', async (req, res) => {
 
 	try {
 		// Delete the OpenVidu Meet room using the API
-		await httpRequest('DELETE', `rooms/${roomId}`);
+		// We use the 'force' parameters to ensure that the room is deleted even if there are active meetings or recordings
+		await httpRequest('DELETE', `rooms/${roomId}?withMeeting=force&withRecordings=force`);
 		res.status(200).json({ message: `Room '${roomId}' deleted successfully` });
 	} catch (error) {
 		handleApiError(res, error, `Error deleting room '${roomId}'`);

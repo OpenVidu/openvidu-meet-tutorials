@@ -52,13 +52,13 @@ function getRoomListItemTemplate(room) {
             <div class="room-actions">
                 <button
                     class="btn btn-primary btn-sm"
-                    onclick="joinRoom('${room.moderatorUrl}');"
+                    onclick="joinRoom('${room.access.anonymous.moderator.url}');"
                 >
                     Join as Moderator
                 </button>
                 <button
                     class="btn btn-secondary btn-sm"
-                    onclick="joinRoom('${room.speakerUrl}');"
+                    onclick="joinRoom('${room.access.anonymous.speaker.url}');"
                 >
                     Join as Speaker
                 </button>

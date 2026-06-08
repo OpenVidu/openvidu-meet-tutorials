@@ -52,13 +52,13 @@ function getRoomListItemTemplate(room) {
             <div class="room-actions">
                 <a
                     class="btn btn-primary btn-sm"
-                    href="${room.moderatorUrl}"
+                    href="${room.access.anonymous.moderator.url}"
                 >
                     Join as Moderator
                 </a>
                 <a
                     class="btn btn-secondary btn-sm"
-                    href="${room.speakerUrl}"
+                    href="${room.access.anonymous.speaker.url}"
                 >
                     Join as Speaker
                 </a>

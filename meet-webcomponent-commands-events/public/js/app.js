@@ -54,7 +54,7 @@ function getRoomListItemTemplate(room) {
                     class="btn btn-primary btn-sm"
                     onclick="joinRoom(
                         '${room.roomName}', 
-                        '${room.moderatorUrl}', 
+                        '${room.access.anonymous.moderator.url}', 
                         'moderator'
                     );"
                 >
@@ -64,8 +64,8 @@ function getRoomListItemTemplate(room) {
                     class="btn btn-secondary btn-sm"
                     onclick="joinRoom(
                         '${room.roomName}', 
-                        '${room.speakerUrl}', 
-                        'speaker',
+                        '${room.access.anonymous.speaker.url}', 
+                        'speaker'
                     );"
                 >
                     Join as Speaker

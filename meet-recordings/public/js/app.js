@@ -55,7 +55,7 @@ function getRoomListItemTemplate(room) {
                     class="btn btn-primary btn-sm"
                     onclick="joinRoom(
                         '${room.roomName}', 
-                        '${room.moderatorUrl}', 
+                        '${room.access.anonymous.moderator.url}', 
                         'moderator'
                     );"
                 >
@@ -65,7 +65,7 @@ function getRoomListItemTemplate(room) {
                     class="btn btn-secondary btn-sm"
                     onclick="joinRoom(
                         '${room.roomName}', 
-                        '${room.speakerUrl}', 
+                        '${room.access.anonymous.speaker.url}', 
                         'speaker'
                     );"
                 >
@@ -331,6 +331,15 @@ async function displayRecording(recordingId) {
         >
         </openvidu-meet>
     `;
+
+	// Add event listener for when the OpenVidu Meet component is closed
+	const meet = document.querySelector('openvidu-meet');
+	meet.once('closed', () => {
+		// Hide the display recording screen and show the home screen
+		displayRecordingScreen.hidden = true;
+		const homeScreen = document.querySelector('#home');
+		homeScreen.hidden = false;
+	});
 }
 
 async function getRecordingUrl(recordingId) {

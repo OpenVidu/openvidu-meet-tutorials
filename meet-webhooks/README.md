@@ -4,7 +4,7 @@ This is a more advanced example of how to integrate OpenVidu Meet into a Node.js
 
 ## Prerequisites
 
--   [Node](https://nodejs.org/en/download)
+- [Node](https://nodejs.org/en/download)
 
 ## Run
 

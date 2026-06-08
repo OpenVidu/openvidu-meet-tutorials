@@ -1,52 +1,52 @@
 const rooms = new Map();
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await fetchRooms();
+	await fetchRooms();
 });
 
 async function fetchRooms() {
-    try {
-        const { rooms: roomsList } = await httpRequest('GET', '/rooms');
+	try {
+		const { rooms: roomsList } = await httpRequest('GET', '/rooms');
 
-        roomsList.forEach((room) => {
-            rooms.set(room.roomId, room);
-        });
-        renderRooms();
-    } catch (error) {
-        console.error('Error fetching rooms:', error.message);
+		roomsList.forEach((room) => {
+			rooms.set(room.roomId, room);
+		});
+		renderRooms();
+	} catch (error) {
+		console.error('Error fetching rooms:', error.message);
 
-        // Show error message
-        const roomsErrorElement = document.querySelector('#no-rooms-or-error');
-        roomsErrorElement.textContent = 'Error loading rooms';
-        roomsErrorElement.hidden = false;
-    }
+		// Show error message
+		const roomsErrorElement = document.querySelector('#no-rooms-or-error');
+		roomsErrorElement.textContent = 'Error loading rooms';
+		roomsErrorElement.hidden = false;
+	}
 }
 
 function renderRooms() {
-    // Clear the previous list of rooms
-    const roomsList = document.querySelector('#rooms-list ul');
-    roomsList.innerHTML = '';
+	// Clear the previous list of rooms
+	const roomsList = document.querySelector('#rooms-list ul');
+	roomsList.innerHTML = '';
 
-    // Show or remove the "No rooms found" message
-    const noRoomsElement = document.querySelector('#no-rooms-or-error');
-    if (rooms.size === 0) {
-        noRoomsElement.textContent = 'No rooms found. Please create a new room.';
-        noRoomsElement.hidden = false;
-        return;
-    } else {
-        noRoomsElement.textContent = '';
-        noRoomsElement.hidden = true;
-    }
+	// Show or remove the "No rooms found" message
+	const noRoomsElement = document.querySelector('#no-rooms-or-error');
+	if (rooms.size === 0) {
+		noRoomsElement.textContent = 'No rooms found. Please create a new room.';
+		noRoomsElement.hidden = false;
+		return;
+	} else {
+		noRoomsElement.textContent = '';
+		noRoomsElement.hidden = true;
+	}
 
-    // Add rooms to the list element
-    Array.from(rooms.values()).forEach((room) => {
-        const roomItem = getRoomListItemTemplate(room);
-        roomsList.innerHTML += roomItem;
-    });
+	// Add rooms to the list element
+	Array.from(rooms.values()).forEach((room) => {
+		const roomItem = getRoomListItemTemplate(room);
+		roomsList.innerHTML += roomItem;
+	});
 }
 
 function getRoomListItemTemplate(room) {
-    return `
+	return `
         <li class="list-group-item">
             <span>${room.roomName}</span>
             <div class="room-actions">
@@ -74,56 +74,59 @@ function getRoomListItemTemplate(room) {
     `;
 }
 
-async function createRoom() {
-    // Clear previous error message
-    const errorDiv = document.querySelector('#create-room-error');
-    errorDiv.textContent = '';
-    errorDiv.hidden = true;
+async function createRoom(e) {
+	// Prevent the default form submission
+	e.preventDefault();
 
-    try {
-        const roomName = document.querySelector('#room-name').value;
-        const { room } = await httpRequest('POST', '/rooms', {
-            roomName
-        });
+	// Clear previous error message
+	const errorDiv = document.querySelector('#create-room-error');
+	errorDiv.textContent = '';
+	errorDiv.hidden = true;
 
-        // Add new room to the list
-        rooms.set(room.roomId, room);
-        renderRooms();
+	try {
+		const roomName = document.querySelector('#room-name').value;
+		const { room } = await httpRequest('POST', '/rooms', {
+			roomName
+		});
 
-        // Reset the form
-        const createRoomForm = document.querySelector('#create-room form');
-        createRoomForm.reset();
-    } catch (error) {
-        console.error('Error creating room:', error.message);
+		// Add new room to the list
+		rooms.set(room.roomId, room);
+		renderRooms();
 
-        // Show error message
-        errorDiv.textContent = 'Error creating room';
-        errorDiv.hidden = false;
-    }
+		// Reset the form
+		const createRoomForm = document.querySelector('#create-room form');
+		createRoomForm.reset();
+	} catch (error) {
+		console.error('Error creating room:', error.message);
+
+		// Show error message
+		errorDiv.textContent = 'Error creating room';
+		errorDiv.hidden = false;
+	}
 }
 
 async function deleteRoom(roomId) {
-    try {
-        await httpRequest('DELETE', `/rooms/${roomId}`);
+	try {
+		await httpRequest('DELETE', `/rooms/${roomId}`);
 
-        // Remove the room from the list
-        rooms.delete(roomId);
-        renderRooms();
-    } catch (error) {
-        console.error('Error deleting room:', error.message);
-    }
+		// Remove the room from the list
+		rooms.delete(roomId);
+		renderRooms();
+	} catch (error) {
+		console.error('Error deleting room:', error.message);
+	}
 }
 
 function joinRoom(roomUrl) {
-    // Hide the home screen and show the room screen
-    const homeScreen = document.querySelector('#home');
-    homeScreen.hidden = true;
-    const roomScreen = document.querySelector('#room');
-    roomScreen.hidden = false;
+	// Hide the home screen and show the room screen
+	const homeScreen = document.querySelector('#home');
+	homeScreen.hidden = true;
+	const roomScreen = document.querySelector('#room');
+	roomScreen.hidden = false;
 
-    // Inject the OpenVidu Meet component into the meeting container specifying the room URL
-    const meetingContainer = document.querySelector('#meeting-container');
-    meetingContainer.innerHTML = `
+	// Inject the OpenVidu Meet component into the meeting container specifying the room URL
+	const meetingContainer = document.querySelector('#meeting-container');
+	meetingContainer.innerHTML = `
         <openvidu-meet
             room-url="${roomUrl}"
             leave-redirect-url="/"
@@ -134,19 +137,19 @@ function joinRoom(roomUrl) {
 
 // Function to make HTTP requests to the backend
 async function httpRequest(method, path, body) {
-    const response = await fetch(path, {
-        method,
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: body ? JSON.stringify(body) : undefined
-    });
+	const response = await fetch(path, {
+		method,
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: body ? JSON.stringify(body) : undefined
+	});
 
-    const responseBody = await response.json();
+	const responseBody = await response.json();
 
-    if (!response.ok) {
-        throw new Error(responseBody.message || 'Failed to perform request to backend');
-    }
+	if (!response.ok) {
+		throw new Error(responseBody.message || 'Failed to perform request to backend');
+	}
 
-    return responseBody;
+	return responseBody;
 }

@@ -24,141 +24,141 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // Create a new room
 app.post('/rooms', async (req, res) => {
-    const { roomName } = req.body;
+	const { roomName } = req.body;
 
-    if (!roomName) {
-        res.status(400).json({ message: `'roomName' is required` });
-        return;
-    }
+	if (!roomName) {
+		res.status(400).json({ message: `'roomName' is required` });
+		return;
+	}
 
-    try {
-        // Create a new OpenVidu Meet room using the API
-        const room = await httpRequest('POST', 'rooms', {
-            roomName,
-            config: {
-                // Default room configuration
-                chat: {
-                    enabled: true // Enable chat for this room
-                },
-                recording: {
-                    enabled: true, // Enable recording for this room
-                    allowAccessTo: 'admin_moderator_speaker' // Allow access to recordings for admin, moderator and speaker roles
-                },
-                virtualBackground: {
-                    enabled: true // Enable virtual background for this room
-                }
-            }
-        });
+	try {
+		// Create a new OpenVidu Meet room using the API
+		const room = await httpRequest('POST', 'rooms', {
+			roomName,
+			config: {
+				// Default room configuration
+				chat: {
+					enabled: true // Enable chat for this room
+				},
+				recording: {
+					enabled: true, // Enable recording for this room
+					allowAccessTo: 'admin_moderator_speaker' // Allow access to recordings for admin, moderator and speaker roles
+				},
+				virtualBackground: {
+					enabled: true // Enable virtual background for this room
+				}
+			}
+		});
 
-        console.log('Room created:', room);
-        res.status(201).json({ message: `Room '${roomName}' created successfully`, room });
-    } catch (error) {
-        handleApiError(res, error, `Error creating room '${roomName}'`);
-    }
+		console.log('Room created:', room);
+		res.status(201).json({ message: `Room '${roomName}' created successfully`, room });
+	} catch (error) {
+		handleApiError(res, error, `Error creating room '${roomName}'`);
+	}
 });
 
 // List all rooms
 app.get('/rooms', async (_req, res) => {
-    try {
-        // List all OpenVidu Meet rooms using the API (100 max)
-        const { rooms } = await httpRequest('GET', 'rooms?maxItems=100');
-        res.status(200).json({ rooms });
-    } catch (error) {
-        handleApiError(res, error, 'Error fetching rooms');
-    }
+	try {
+		// List all OpenVidu Meet rooms using the API (100 max)
+		const { rooms } = await httpRequest('GET', 'rooms?maxItems=100');
+		res.status(200).json({ rooms });
+	} catch (error) {
+		handleApiError(res, error, 'Error fetching rooms');
+	}
 });
 
 // Delete a room
 app.delete('/rooms/:roomId', async (req, res) => {
-    const { roomId } = req.params;
+	const { roomId } = req.params;
 
-    try {
-        // Delete the OpenVidu Meet room using the API
-        await httpRequest('DELETE', `rooms/${roomId}`);
-        res.status(200).json({ message: `Room '${roomId}' deleted successfully` });
-    } catch (error) {
-        handleApiError(res, error, `Error deleting room '${roomId}'`);
-    }
+	try {
+		// Delete the OpenVidu Meet room using the API
+		await httpRequest('DELETE', `rooms/${roomId}`);
+		res.status(200).json({ message: `Room '${roomId}' deleted successfully` });
+	} catch (error) {
+		handleApiError(res, error, `Error deleting room '${roomId}'`);
+	}
 });
 
 // List all recordings
 app.get('/recordings', async (req, res) => {
-    // Create the base path for recordings, including maxItems parameter
-    let recordingsPath = `recordings?maxItems=100`;
+	// Create the base path for recordings, including maxItems parameter
+	let recordingsPath = `recordings?maxItems=100`;
 
-    const { room: roomName } = req.query;
-    if (roomName) {
-        // If a room is specified, filter recordings by room
-        recordingsPath += `&roomId=${roomName}`;
-    }
+	const { room: roomName } = req.query;
+	if (roomName) {
+		// If a room is specified, filter recordings by room
+		recordingsPath += `&roomId=${roomName}`;
+	}
 
-    try {
-        const { recordings } = await httpRequest('GET', recordingsPath);
-        res.status(200).json({ recordings });
-    } catch (error) {
-        handleApiError(res, error, 'Error fetching recordings');
-    }
+	try {
+		const { recordings } = await httpRequest('GET', recordingsPath);
+		res.status(200).json({ recordings });
+	} catch (error) {
+		handleApiError(res, error, 'Error fetching recordings');
+	}
 });
 
 // Delete a recording
 app.delete('/recordings/:recordingId', async (req, res) => {
-    const { recordingId } = req.params;
+	const { recordingId } = req.params;
 
-    try {
-        // Delete the recording using OpenVidu Meet API
-        await httpRequest('DELETE', `recordings/${recordingId}`);
-        res.status(200).json({ message: `Recording '${recordingId}' deleted successfully` });
-    } catch (error) {
-        handleApiError(res, error, `Error deleting recording '${recordingId}'`);
-    }
+	try {
+		// Delete the recording using OpenVidu Meet API
+		await httpRequest('DELETE', `recordings/${recordingId}`);
+		res.status(200).json({ message: `Recording '${recordingId}' deleted successfully` });
+	} catch (error) {
+		handleApiError(res, error, `Error deleting recording '${recordingId}'`);
+	}
 });
 
 // Get recording URL
 app.get('/recordings/:recordingId/url', async (req, res) => {
-    const { recordingId } = req.params;
+	const { recordingId } = req.params;
 
-    try {
-        // Fetch the recording URL using OpenVidu Meet API
-        const { url } = await httpRequest('GET', `recordings/${recordingId}/url`);
-        res.status(200).json({ url });
-    } catch (error) {
-        handleApiError(res, error, `Error fetching URL for recording '${recordingId}'`);
-    }
+	try {
+		// Fetch the recording URL using OpenVidu Meet API
+		const { url } = await httpRequest('GET', `recordings/${recordingId}/url`);
+		res.status(200).json({ url });
+	} catch (error) {
+		handleApiError(res, error, `Error fetching URL for recording '${recordingId}'`);
+	}
 });
 
 // Start the server
 app.listen(SERVER_PORT, () => {
-    console.log(`Server listening on http://localhost:${SERVER_PORT}`);
+	console.log(`Server listening on http://localhost:${SERVER_PORT}`);
 });
 
 // Function to make HTTP requests to OpenVidu Meet API
 const httpRequest = async (method, path, body) => {
-    const response = await fetch(`${OV_MEET_SERVER_URL}/api/v1/${path}`, {
-        method,
-        headers: {
-            'Content-Type': 'application/json',
-            'X-API-KEY': OV_MEET_API_KEY // Include the API key in the header for authentication
-        },
-        body: body ? JSON.stringify(body) : undefined
-    });
+	const response = await fetch(`${OV_MEET_SERVER_URL}/api/v1/${path}`, {
+		method,
+		headers: {
+			'Content-Type': 'application/json',
+			'X-API-KEY': OV_MEET_API_KEY // Include the API key in the header for authentication
+		},
+		body: body ? JSON.stringify(body) : undefined
+	});
 
-    const responseBody = await response.json();
+	const responseBody = await response.json();
 
-    if (!response.ok) {
-        console.error('Error while performing request to OpenVidu Meet API:', responseBody);
-        // Create an error object that includes the HTTP status code from the API
-        const error = new Error(responseBody.message || 'Failed to perform request to OpenVidu Meet API');
-        error.statusCode = response.status;
-        throw error;
-    }
+	if (!response.ok) {
+		console.error('Error while performing request to OpenVidu Meet API:', responseBody);
+		// Create an error object that includes the HTTP status code from the API
+		const error = new Error(responseBody.message || 'Failed to perform request to OpenVidu Meet API');
+		error.statusCode = response.status;
+		throw error;
+	}
 
-    return responseBody;
+	return responseBody;
 };
 
 // Helper function to handle API errors consistently
 const handleApiError = (res, error, message) => {
-    console.error(`${message}: ${error.message}`);
-    const statusCode = error.statusCode || 500;
-    const errorMessage = error.statusCode ? error.message : message;
-    res.status(statusCode).json({ message: errorMessage });
+	console.error(`${message}: ${error.message}`);
+	const statusCode = error.statusCode || 500;
+	const errorMessage = error.statusCode ? error.message : message;
+	res.status(statusCode).json({ message: errorMessage });
 };

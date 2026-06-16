@@ -22,6 +22,59 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, '../public')));
 
+// --- USERS ---
+
+// Create a new user
+app.post('/users', async (req, res) => {
+	const { userId, name, password } = req.body;
+
+	if (!userId || !name || !password) {
+		res.status(400).json({ message: `'userId', 'name' and 'password' are required` });
+		return;
+	}
+
+	try {
+		// Create a new OpenVidu Meet user using the API.
+		// The 'room_member' role lets the user access only the rooms where they are added as a member;
+		// they cannot create or manage rooms (that would be the 'room_manager' or 'admin' roles).
+		const user = await httpRequest('POST', 'users', {
+			userId,
+			name,
+			password,
+			role: 'room_member'
+		});
+
+		console.log('User created:', user);
+		res.status(201).json({ message: `User '${userId}' created successfully`, user });
+	} catch (error) {
+		handleApiError(res, error, `Error creating user '${userId}'`);
+	}
+});
+
+// List users
+app.get('/users', async (_req, res) => {
+	try {
+		// List OpenVidu Meet users using the API (100 max).
+		// We only list 'room_member' users, because they are the ones this tutorial creates.
+		const { users } = await httpRequest('GET', 'users?role=room_member&maxItems=100');
+		res.status(200).json({ users });
+	} catch (error) {
+		handleApiError(res, error, 'Error fetching users');
+	}
+});
+
+// Delete a user
+app.delete('/users/:userId', async (req, res) => {
+	const { userId } = req.params;
+
+	try {
+		await httpRequest('DELETE', `users/${userId}`);
+		res.status(200).json({ message: `User '${userId}' deleted successfully` });
+	} catch (error) {
+		handleApiError(res, error, `Error deleting user '${userId}'`);
+	}
+});
+
 // --- ROOMS ---
 
 // Create a new room
@@ -71,54 +124,54 @@ app.delete('/rooms/:roomId', async (req, res) => {
 	}
 });
 
-// --- ROOM MEMBERS (EXTERNAL) ---
+// --- ROOM MEMBERS (USERS AND IDENTIFIED GUESTS) ---
 
-// Add an external member to a room
+// Add a member to a room (either a user or an identified guest)
 app.post('/rooms/:roomId/members', async (req, res) => {
 	const { roomId } = req.params;
-	const { name, baseRole } = req.body;
+	const { userId, name, baseRole } = req.body;
 
-	if (!name || !baseRole) {
-		res.status(400).json({ message: `'name' and 'baseRole' are required` });
+	if (!baseRole || (!userId && !name)) {
+		res.status(400).json({
+			message: `'baseRole' and either 'userId' (for a user) or 'name' (for an identified guest) are required`
+		});
 		return;
 	}
 
 	try {
-		// Add an external member to the room.
-		// Providing 'name' (and no 'userId') creates a member of type 'external':
-		// the API generates a unique 'memberId' (ext-XXXX) and a unique 'accessUrl'
-		// that grants access without any authentication.
-		const member = await httpRequest('POST', `rooms/${roomId}/members`, {
-			name,
-			baseRole
-		});
+		// Add a member to the room. The member type depends on which field is provided:
+		// - 'userId' (and no 'name') adds a Meet user, creating a member of type 'user'.
+		// - 'name' (and no 'userId') adds an identified guest, creating a member of type 'identified_guest'.
+		const memberOptions = userId ? { userId, baseRole } : { name, baseRole };
+		const member = await httpRequest('POST', `rooms/${roomId}/members`, memberOptions);
 
-		console.log('External member added:', member);
-		res.status(201).json({ message: `External member '${name}' added to room '${roomId}'`, member });
+		console.log('Member added:', member);
+		res.status(201).json({ message: `Member added to room '${roomId}'`, member });
 	} catch (error) {
-		handleApiError(res, error, `Error adding external member '${name}' to room '${roomId}'`);
+		handleApiError(res, error, `Error adding member to room '${roomId}'`);
 	}
 });
 
-// List the external members of a room
+// List the members of a room (both users and identified guests)
 app.get('/rooms/:roomId/members', async (req, res) => {
 	const { roomId } = req.params;
 
 	try {
-		// List the external members of the room using the API (100 max)
-		const { members } = await httpRequest('GET', `rooms/${roomId}/members?type=external&maxItems=100`);
+		// List all the members of the room using the API (100 max).
+		// We do not filter by type, so both users and identified guests are returned.
+		const { members } = await httpRequest('GET', `rooms/${roomId}/members?maxItems=100`);
 		res.status(200).json({ members });
 	} catch (error) {
 		handleApiError(res, error, `Error fetching members of room '${roomId}'`);
 	}
 });
 
-// Remove an external member from a room
+// Remove a member from a room
 app.delete('/rooms/:roomId/members/:memberId', async (req, res) => {
 	const { roomId, memberId } = req.params;
 
 	try {
-		// Removing a member revokes their unique access link immediately
+		// Removing a member revokes their access immediately
 		// (they are expelled if currently in a meeting)
 		await httpRequest('DELETE', `rooms/${roomId}/members/${memberId}`);
 		res.status(200).json({ message: `Member '${memberId}' removed from room '${roomId}'` });

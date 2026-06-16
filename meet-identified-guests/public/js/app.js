@@ -1,4 +1,3 @@
-const users = new Map();
 const rooms = new Map();
 const members = new Map();
 
@@ -6,114 +5,8 @@ const members = new Map();
 let currentRoom = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-	await Promise.all([fetchUsers(), fetchRooms()]);
+	await fetchRooms();
 });
-
-// --- USERS ---
-
-async function fetchUsers() {
-	try {
-		const { users: usersList } = await httpRequest('GET', '/users');
-
-		users.clear();
-		usersList.forEach((user) => {
-			users.set(user.userId, user);
-		});
-		renderUsers();
-	} catch (error) {
-		console.error('Error fetching users:', error.message);
-
-		// Show error message
-		const usersErrorElement = document.querySelector('#no-users-or-error');
-		usersErrorElement.textContent = 'Error loading users';
-		usersErrorElement.hidden = false;
-	}
-}
-
-function renderUsers() {
-	// Clear the previous list of users
-	const usersList = document.querySelector('#users-list');
-	usersList.innerHTML = '';
-
-	// Show or remove the "No users found" message
-	const noUsersElement = document.querySelector('#no-users-or-error');
-	if (users.size === 0) {
-		noUsersElement.textContent = 'No users found. Please create a new user.';
-		noUsersElement.hidden = false;
-		return;
-	} else {
-		noUsersElement.textContent = '';
-		noUsersElement.hidden = true;
-	}
-
-	// Add users to the list element
-	Array.from(users.values()).forEach((user) => {
-		const userItem = getUserListItemTemplate(user);
-		usersList.innerHTML += userItem;
-	});
-}
-
-function getUserListItemTemplate(user) {
-	return `
-        <li class="list-group-item">
-            <span><strong>${user.userId}</strong> · ${user.name}</span>
-            <button
-                title="Delete user"
-                class="icon-button delete-button"
-                onclick="deleteUser('${user.userId}');"
-            >
-                <i class="fa-solid fa-trash"></i>
-            </button>
-        </li>
-    `;
-}
-
-async function createUser(e) {
-	// Prevent the default form submission
-	e.preventDefault();
-
-	// Clear previous error message
-	const errorDiv = document.querySelector('#create-user-error');
-	errorDiv.textContent = '';
-	errorDiv.hidden = true;
-
-	try {
-		const userId = document.querySelector('#user-id').value;
-		const name = document.querySelector('#user-name').value;
-		const password = document.querySelector('#user-password').value;
-
-		const { user } = await httpRequest('POST', '/users', {
-			userId,
-			name,
-			password
-		});
-
-		// Add new user to the list
-		users.set(user.userId, user);
-		renderUsers();
-
-		// Reset the form
-		e.target.reset();
-	} catch (error) {
-		console.error('Error creating user:', error.message);
-
-		// Show error message
-		errorDiv.textContent = error.message || 'Error creating user';
-		errorDiv.hidden = false;
-	}
-}
-
-async function deleteUser(userId) {
-	try {
-		await httpRequest('DELETE', `/users/${userId}`);
-
-		// Remove the user from the list
-		users.delete(userId);
-		renderUsers();
-	} catch (error) {
-		console.error('Error deleting user:', error.message);
-	}
-}
 
 // --- ROOMS ---
 
@@ -138,7 +31,7 @@ async function fetchRooms() {
 
 function renderRooms() {
 	// Clear the previous list of rooms
-	const roomsList = document.querySelector('#rooms-list');
+	const roomsList = document.querySelector('#rooms-list ul');
 	roomsList.innerHTML = '';
 
 	// Show or remove the "No rooms found" message
@@ -164,10 +57,19 @@ function getRoomListItemTemplate(room) {
         <li class="list-group-item">
             <span>${room.roomName}</span>
             <div class="room-actions">
-                <button 
-					class="btn btn-primary btn-sm"
-					onclick="manageMembers('${room.roomId}');"
-				>
+                <button
+                    class="btn btn-primary btn-sm"
+                    onclick="joinRoom('${room.access.anonymous.moderator.url}', '#home');"
+                >
+                    Join as Moderator
+                </button>
+                <button
+                    class="btn btn-secondary btn-sm"
+                    onclick="joinRoom('${room.access.anonymous.speaker.url}', '#home');"
+                >
+                    Join as Speaker
+                </button>
+                <button class="btn btn-success btn-sm" onclick="manageMembers('${room.roomId}');">
                     Members
                 </button>
                 <button
@@ -224,7 +126,7 @@ async function deleteRoom(roomId) {
 	}
 }
 
-// --- ROOM MEMBERS ---
+// --- ROOM MEMBERS (IDENTIFIED GUESTS) ---
 
 async function manageMembers(roomId) {
 	currentRoom = rooms.get(roomId);
@@ -268,9 +170,6 @@ async function fetchMembers() {
 }
 
 function renderMembers() {
-	// Refresh the list of users that can still be added as members
-	renderMemberUserOptions();
-
 	// Clear the previous list of members
 	const membersList = document.querySelector('#members-list ul');
 	membersList.innerHTML = '';
@@ -278,7 +177,7 @@ function renderMembers() {
 	// Show or remove the "No members found" message
 	const noMembersElement = document.querySelector('#no-members-or-error');
 	if (members.size === 0) {
-		noMembersElement.textContent = 'No members yet. Add a user as a member of this room.';
+		noMembersElement.textContent = 'No members yet. Add an identified guest to this room.';
 		noMembersElement.hidden = false;
 		return;
 	} else {
@@ -293,22 +192,9 @@ function renderMembers() {
 	});
 }
 
-// Populate the "add member" select with the users that are not already members of the room
-function renderMemberUserOptions() {
-	const select = document.querySelector('#member-user');
-	const availableUsers = Array.from(users.values()).filter((user) => !members.has(user.userId));
-
-	if (availableUsers.length === 0) {
-		select.innerHTML = `<option value="" disabled selected>No users available</option>`;
-		return;
-	}
-
-	select.innerHTML =
-		`<option value="" disabled selected>Select a user</option>` +
-		availableUsers.map((user) => `<option value="${user.userId}">${user.userId} · ${user.name}</option>`).join('');
-}
-
 function getMemberListItemTemplate(member) {
+	// In this tutorial every member is an identified guest, so each one has a unique
+	// access link and buttons to copy it, join through it and remove the member.
 	return `
         <li class="member-container">
             <div class="member-info">
@@ -318,14 +204,28 @@ function getMemberListItemTemplate(member) {
                         ${member.baseRole}
                     </span>
                 </p>
-                <p class="member-id" title="${member.memberId}">${member.memberId}</p>
+                <p class="member-url" title="${member.accessUrl}">${member.accessUrl}</p>
             </div>
             <div class="member-actions">
+                <button 
+					title="Copy access link"
+					class="icon-button"
+					onclick="copyAccessUrl('${member.memberId}', this)"
+				>
+                    <i class="fa-solid fa-copy"></i>
+                </button>
+                <button 
+					title="Join as ${member.name}"
+					class="icon-button"
+					onclick="joinRoom('${member.accessUrl}', '#members')"
+				>
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                </button>
                 <button
-                    title="Remove member"
-                    class="icon-button delete-button"
-                    onclick="removeMember('${member.memberId}')"
-                >
+					title="Remove member"
+					class="icon-button delete-button"
+					onclick="removeMember('${member.memberId}')"
+				>
                     <i class="fa-solid fa-trash"></i>
                 </button>
             </div>
@@ -333,7 +233,7 @@ function getMemberListItemTemplate(member) {
     `;
 }
 
-async function addMember(e) {
+async function addGuest(e) {
 	// Prevent the default form submission
 	e.preventDefault();
 
@@ -343,22 +243,26 @@ async function addMember(e) {
 	errorDiv.hidden = true;
 
 	try {
-		const userId = document.querySelector('#member-user').value;
-		const baseRole = document.querySelector('#member-role').value;
+		const name = document.querySelector('#guest-name').value;
+		const baseRole = document.querySelector('#guest-role').value;
 
+		// Providing 'name' adds an identified guest (member of type 'identified_guest')
 		const { member } = await httpRequest('POST', `/rooms/${currentRoom.roomId}/members`, {
-			userId,
+			name,
 			baseRole
 		});
 
 		// Add new member to the list
 		members.set(member.memberId, member);
 		renderMembers();
+
+		// Reset the form
+		e.target.reset();
 	} catch (error) {
-		console.error('Error adding member:', error.message);
+		console.error('Error adding guest:', error.message);
 
 		// Show error message
-		errorDiv.textContent = error.message || 'Error adding member';
+		errorDiv.textContent = error.message || 'Error adding guest';
 		errorDiv.hidden = false;
 	}
 }
@@ -375,23 +279,40 @@ async function removeMember(memberId) {
 	}
 }
 
+async function copyAccessUrl(memberId, button) {
+	const member = members.get(memberId);
+	if (!member) {
+		return;
+	}
+
+	try {
+		await navigator.clipboard.writeText(member.accessUrl);
+
+		// Briefly show a confirmation icon
+		const icon = button.querySelector('i');
+		const previousClass = icon.className;
+		icon.className = 'fa-solid fa-check';
+		setTimeout(() => {
+			icon.className = previousClass;
+		}, 1500);
+	} catch (error) {
+		console.error('Error copying access link:', error.message);
+	}
+}
+
 // --- JOIN ---
 
-function joinRoom() {
-	// All registered members share the same authenticated access URL for the room.
-	// Each member proves their identity by logging in with their OpenVidu Meet credentials.
-	const roomUrl = currentRoom.access.registered.url;
-	console.log(`Joining room through URL: ${roomUrl}`);
-
-	// Hide the members screen and show the room screen
-	const membersScreen = document.querySelector('#members');
-	membersScreen.hidden = true;
+// Embed the OpenVidu Meet component for the given room URL.
+// 'returnViewId' is the view to show again when the meeting is closed
+// (the home screen for anonymous access, the members screen for an identified guest).
+function joinRoom(roomUrl, returnViewId) {
+	// Hide the home and members screens and show the room screen
+	document.querySelector('#home').hidden = true;
+	document.querySelector('#members').hidden = true;
 	const roomScreen = document.querySelector('#room');
 	roomScreen.hidden = false;
 
-	// Inject the OpenVidu Meet component into the meeting container specifying the room URL.
-	// Since this URL requires authentication, OpenVidu Meet will show its own login form
-	// inside the component until the member logs in.
+	// Inject the OpenVidu Meet component into the meeting container specifying the room URL
 	const meetingContainer = document.querySelector('#meeting-container');
 	meetingContainer.innerHTML = `
         <openvidu-meet
@@ -405,10 +326,10 @@ function joinRoom() {
 	meet.once('closed', () => {
 		console.log('OpenVidu Meet component closed');
 
-		// Clear the component and go back to the members screen
+		// Clear the component and go back to the view we came from
 		meetingContainer.innerHTML = '';
 		roomScreen.hidden = true;
-		membersScreen.hidden = false;
+		document.querySelector(returnViewId).hidden = false;
 	});
 }
 

@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es">
 	<head>
-		<title>OpenVidu Meet External Members Tutorial</title>
+		<title>OpenVidu Meet Identified Guests Tutorial</title>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
@@ -62,15 +62,17 @@
 				<h2 id="members-room-name" class="text-primary"></h2>
 			</div>
 
-			<!-- Add external member form -->
-			<form id="add-member-form" onsubmit="addMember(event)">
-				<input type="text" id="member-name" class="form-control" placeholder="Member name (e.g. Charlie)" required />
-				<select id="member-role" class="form-select">
-					<option value="speaker">Speaker</option>
-					<option value="moderator">Moderator</option>
-				</select>
-				<button type="submit" class="btn btn-success">Add member</button>
-			</form>
+			<!-- Add member forms: an identified guest (by name) -->
+			<div id="add-member-forms">
+				<form class="add-member-form" onsubmit="addGuest(event)">
+					<input type="text" id="guest-name" class="form-control" placeholder="Guest name (e.g. Charlie)" required />
+					<select id="guest-role" class="form-select">
+						<option value="speaker">Speaker</option>
+						<option value="moderator">Moderator</option>
+					</select>
+					<button type="submit" class="btn btn-success">Add guest</button>
+				</form>
+			</div>
 
 			<!-- Error message -->
 			<div id="add-member-error" class="alert alert-danger" hidden></div>
@@ -86,8 +88,8 @@
 			</div>
 
 			<p class="members-hint text-muted">
-				Each external member has a <strong>unique</strong> access link. Deliver it privately to the intended
-				person; anyone opening it joins the meeting as that member, with no login required.
+				Each identified guest has a <strong>unique</strong> access link. Deliver it privately to the intended
+				person; anyone opening it joins the meeting as that guest, with no login required.
 			</p>
 		</div>
 

@@ -1,5 +1,5 @@
 {
-	"name": "meet-registered-members",
+	"name": "meet-users",
 	"version": "1.0.0",
 	"main": "src/index.js",
 	"type": "module",

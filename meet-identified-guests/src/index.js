@@ -22,59 +22,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, '../public')));
 
-// --- USERS ---
-
-// Create a new user
-app.post('/users', async (req, res) => {
-	const { userId, name, password } = req.body;
-
-	if (!userId || !name || !password) {
-		res.status(400).json({ message: `'userId', 'name' and 'password' are required` });
-		return;
-	}
-
-	try {
-		// Create a new OpenVidu Meet user using the API.
-		// The 'room_member' role lets the user access only the rooms where they are added as a member;
-		// they cannot create or manage rooms.
-		const user = await httpRequest('POST', 'users', {
-			userId,
-			name,
-			password,
-			role: 'room_member'
-		});
-
-		console.log('User created:', user);
-		res.status(201).json({ message: `User '${userId}' created successfully`, user });
-	} catch (error) {
-		handleApiError(res, error, `Error creating user '${userId}'`);
-	}
-});
-
-// List users
-app.get('/users', async (_req, res) => {
-	try {
-		// List OpenVidu Meet users using the API (100 max).
-		// We only list 'room_member' users, because they are the ones this tutorial creates
-		const { users } = await httpRequest('GET', 'users?role=room_member&maxItems=100');
-		res.status(200).json({ users });
-	} catch (error) {
-		handleApiError(res, error, 'Error fetching users');
-	}
-});
-
-// Delete a user
-app.delete('/users/:userId', async (req, res) => {
-	const { userId } = req.params;
-
-	try {
-		await httpRequest('DELETE', `users/${userId}`);
-		res.status(200).json({ message: `User '${userId}' deleted successfully` });
-	} catch (error) {
-		handleApiError(res, error, `Error deleting user '${userId}'`);
-	}
-});
-
 // --- ROOMS ---
 
 // Create a new room
@@ -124,41 +71,42 @@ app.delete('/rooms/:roomId', async (req, res) => {
 	}
 });
 
-// --- ROOM MEMBERS ---
+// --- ROOM MEMBERS (IDENTIFIED GUESTS) ---
 
-// Add a registered user as a member of a room
+// Add an identified guest to a room
 app.post('/rooms/:roomId/members', async (req, res) => {
 	const { roomId } = req.params;
-	const { userId, baseRole } = req.body;
+	const { name, baseRole } = req.body;
 
-	if (!userId || !baseRole) {
-		res.status(400).json({ message: `'userId' and 'baseRole' are required` });
+	if (!name || !baseRole) {
+		res.status(400).json({ message: `'name' and 'baseRole' are required` });
 		return;
 	}
 
 	try {
-		// Add the registered user as a member of the room.
-		// Providing 'userId' (and no 'name') creates a member of type 'registered':
-		// the member is linked to the user account and identified through authentication.
+		// Add an identified guest to the room.
+		// Providing 'name' (and no 'userId') creates a member of type 'identified_guest':
+		// the API generates a unique 'memberId' (guest-XXXX) and a unique 'accessUrl'
+		// that grants access to the room without any authentication.
 		const member = await httpRequest('POST', `rooms/${roomId}/members`, {
-			userId,
+			name,
 			baseRole
 		});
 
-		console.log('Member added:', member);
-		res.status(201).json({ message: `User '${userId}' added to room '${roomId}'`, member });
+		console.log('Identified guest added:', member);
+		res.status(201).json({ message: `Identified guest '${name}' added to room '${roomId}'`, member });
 	} catch (error) {
-		handleApiError(res, error, `Error adding user '${userId}' to room '${roomId}'`);
+		handleApiError(res, error, `Error adding identified guest '${name}' to room '${roomId}'`);
 	}
 });
 
-// List the members of a room (only registered members)
+// List the identified guests of a room
 app.get('/rooms/:roomId/members', async (req, res) => {
 	const { roomId } = req.params;
 
 	try {
-		// List the registered members of the room using the API (100 max)
-		const { members } = await httpRequest('GET', `rooms/${roomId}/members?type=registered&maxItems=100`);
+		// List the identified guests of the room using the API (100 max)
+		const { members } = await httpRequest('GET', `rooms/${roomId}/members?type=identified_guest&maxItems=100`);
 		res.status(200).json({ members });
 	} catch (error) {
 		handleApiError(res, error, `Error fetching members of room '${roomId}'`);

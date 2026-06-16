@@ -128,17 +128,20 @@ html {
 	text-align: center;
 }
 
-#add-member-form {
+#add-member-forms {
 	display: flex;
+	flex-direction: column;
 	gap: 10px;
 	margin-bottom: 15px;
 }
 
-#add-member-form #member-name {
-	flex: 2;
+.add-member-form {
+	display: flex;
+	gap: 10px;
 }
 
-#add-member-form #member-role {
+.add-member-form .form-select,
+.add-member-form .form-control {
 	flex: 1;
 }
 

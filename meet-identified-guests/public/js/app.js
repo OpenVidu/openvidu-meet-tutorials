@@ -69,7 +69,10 @@ function getRoomListItemTemplate(room) {
                 >
                     Join as Speaker
                 </button>
-                <button class="btn btn-success btn-sm" onclick="manageMembers('${room.roomId}');">
+                <button
+					class="btn btn-success btn-sm"
+					onclick="manageMembers('${room.roomId}');"
+				>
                     Members
                 </button>
                 <button

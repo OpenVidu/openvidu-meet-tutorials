@@ -1,6 +1,6 @@
-# OpenVidu Meet Webhooks
+# OpenVidu Meet WebComponent Basic Example
 
-This is a more advanced example of how to integrate OpenVidu Meet into a Node.js application, featuring live room and recording status updates via webhooks. It is built using Node.js and Express for the backend and plain HTML/CSS/JavaScript for the frontend.
+This is a basic example of how to integrate OpenVidu Meet into a Node.js application using its WebComponent. It is built using Node.js and Express for the backend and plain HTML/CSS/JavaScript for the frontend.
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ This is a more advanced example of how to integrate OpenVidu Meet into a Node.js
 
 ```bash
 git clone https://github.com/OpenVidu/openvidu-meet-tutorials.git
-cd openvidu-meet-tutorials/meet-webhooks
+cd openvidu-meet-tutorials/integration/meet-webcomponent-basic
 ```
 
 2. Install dependencies

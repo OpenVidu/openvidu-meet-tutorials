@@ -1,6 +1,6 @@
-# OpenVidu Meet Direct Link
+# OpenVidu Meet Recordings
 
-This is a simple example of how to use OpenVidu Meet in a Node.js application by creating a direct link to a meeting room. It is built using Node.js and Express for the backend and plain HTML/CSS/JavaScript for the frontend.
+This is a more advanced example of how to integrate OpenVidu Meet into a Node.js application and self-manage recordings. It is built using Node.js and Express for the backend and plain HTML/CSS/JavaScript for the frontend.
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ This is a simple example of how to use OpenVidu Meet in a Node.js application by
 
 ```bash
 git clone https://github.com/OpenVidu/openvidu-meet-tutorials.git
-cd openvidu-meet-tutorials/meet-direct-link
+cd openvidu-meet-tutorials/advanced-features/meet-recordings
 ```
 
 2. Install dependencies

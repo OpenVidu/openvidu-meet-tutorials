@@ -15,7 +15,7 @@ This example extends the [meet-identified-guests](../meet-identified-guests) tut
 
 ```bash
 git clone https://github.com/OpenVidu/openvidu-meet-tutorials.git
-cd openvidu-meet-tutorials/meet-users
+cd openvidu-meet-tutorials/access/meet-users
 ```
 
 2. Install dependencies

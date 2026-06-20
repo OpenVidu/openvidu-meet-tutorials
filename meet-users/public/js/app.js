@@ -166,15 +166,15 @@ function getRoomListItemTemplate(room) {
             <div class="room-actions">
                 <button
                     class="btn btn-primary btn-sm"
-                    onclick="joinRoom('${room.access.anonymous.moderator.url}', '#home');"
+                    onclick="accessRoom('${room.access.anonymous.moderator.url}', '#home');"
                 >
-                    Join as Moderator
+                    Access as Moderator
                 </button>
                 <button
                     class="btn btn-secondary btn-sm"
-                    onclick="joinRoom('${room.access.anonymous.speaker.url}', '#home');"
+                    onclick="accessRoom('${room.access.anonymous.speaker.url}', '#home');"
                 >
-                    Join as Speaker
+                    Access as Speaker
                 </button>
                 <button
 					class="btn btn-success btn-sm"
@@ -322,14 +322,14 @@ function renderMemberUserOptions() {
 }
 
 function getMemberListItemTemplate(member) {
-	// A member can be a user (joins by logging in) or an identified guest (joins through a unique link)
+	// A member can be a user (accesses the room by logging in) or an identified guest (accesses the room through a unique link)
 	const isGuest = member.type === 'identified_guest';
 	const typeLabel = isGuest ? 'Guest' : 'User';
 	// For guests we show their unique access link; for users we show their member id (their user ID)
 	const subtitle = isGuest ? member.accessUrl : member.memberId;
 
-	// Guests have buttons to copy their unique link and to join through it.
-	// Users join through the room's "Join as user" button instead, so they only have a remove button.
+	// Guests have buttons to copy their unique link and to access the room through it.
+	// Users access through the room's "Access as user" button instead, so they only have a remove button.
 	const guestActions = isGuest
 		? `
                 <button
@@ -340,9 +340,9 @@ function getMemberListItemTemplate(member) {
                     <i class="fa-solid fa-copy"></i>
                 </button>
                 <button
-					title="Join as ${member.name}"
+					title="Access as ${member.name}"
 					class="icon-button"
-					onclick="joinRoom('${member.accessUrl}', '#members')"
+					onclick="accessRoom('${member.accessUrl}', '#members')"
 				>
                     <i class="fa-solid fa-right-to-bracket"></i>
                 </button>`
@@ -472,18 +472,18 @@ async function copyAccessUrl(memberId, button) {
 	}
 }
 
-// --- JOIN ---
+// --- ACCESS ---
 
-// Join the room as a user: all users share the same authenticated access URL.
+// Access the room as a user: all users share the same authenticated access URL.
 // OpenVidu Meet shows its own login form inside the component until the user logs in.
-function joinAsUser() {
-	joinRoom(currentRoom.access.user.url, '#members');
+function accessAsUser() {
+	accessRoom(currentRoom.access.user.url, '#members');
 }
 
 // Embed the OpenVidu Meet component for the given room URL.
 // 'returnViewId' is the view to show again when the meeting is closed
 // (the home screen for anonymous access, the members screen for a user or identified guest).
-function joinRoom(roomUrl, returnViewId) {
+function accessRoom(roomUrl, returnViewId) {
 	// Hide the home and members screens and show the room screen
 	document.querySelector('#home').hidden = true;
 	document.querySelector('#members').hidden = true;

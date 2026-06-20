@@ -54,13 +54,13 @@ function getRoomListItemTemplate(room) {
                     class="btn btn-primary btn-sm"
                     href="${room.access.anonymous.moderator.url}"
                 >
-                    Join as Moderator
+                    Access as Moderator
                 </a>
                 <a
                     class="btn btn-secondary btn-sm"
                     href="${room.access.anonymous.speaker.url}"
                 >
-                    Join as Speaker
+                    Access as Speaker
                 </a>
                 <button 
                     title="Delete room"

@@ -52,15 +52,15 @@ function getRoomListItemTemplate(room) {
             <div class="room-actions">
                 <button
                     class="btn btn-primary btn-sm"
-                    onclick="joinRoom('${room.access.anonymous.moderator.url}');"
+                    onclick="accessRoom('${room.access.anonymous.moderator.url}');"
                 >
-                    Join as Moderator
+                    Access as Moderator
                 </button>
                 <button
                     class="btn btn-secondary btn-sm"
-                    onclick="joinRoom('${room.access.anonymous.speaker.url}');"
+                    onclick="accessRoom('${room.access.anonymous.speaker.url}');"
                 >
-                    Join as Speaker
+                    Access as Speaker
                 </button>
                 <button 
                     title="Delete room"
@@ -117,7 +117,7 @@ async function deleteRoom(roomId) {
 	}
 }
 
-function joinRoom(roomUrl) {
+function accessRoom(roomUrl) {
 	// Hide the home screen and show the room screen
 	const homeScreen = document.querySelector('#home');
 	homeScreen.hidden = true;

@@ -59,15 +59,15 @@ function getRoomListItemTemplate(room) {
             <div class="room-actions">
                 <button
                     class="btn btn-primary btn-sm"
-                    onclick="joinRoom('${room.access.anonymous.moderator.url}', '#home');"
+                    onclick="accessRoom('${room.access.anonymous.moderator.url}', '#home');"
                 >
-                    Join as Moderator
+                    Access as Moderator
                 </button>
                 <button
                     class="btn btn-secondary btn-sm"
-                    onclick="joinRoom('${room.access.anonymous.speaker.url}', '#home');"
+                    onclick="accessRoom('${room.access.anonymous.speaker.url}', '#home');"
                 >
-                    Join as Speaker
+                    Access as Speaker
                 </button>
                 <button
 					class="btn btn-success btn-sm"
@@ -197,7 +197,7 @@ function renderMembers() {
 
 function getMemberListItemTemplate(member) {
 	// In this tutorial every member is an identified guest, so each one has a unique
-	// access link and buttons to copy it, join through it and remove the member.
+	// access link and buttons to copy it, access the room through it and remove the member.
 	return `
         <li class="member-container">
             <div class="member-info">
@@ -218,9 +218,9 @@ function getMemberListItemTemplate(member) {
                     <i class="fa-solid fa-copy"></i>
                 </button>
                 <button 
-					title="Join as ${member.name}"
+					title="Access as ${member.name}"
 					class="icon-button"
-					onclick="joinRoom('${member.accessUrl}', '#members')"
+					onclick="accessRoom('${member.accessUrl}', '#members')"
 				>
                     <i class="fa-solid fa-right-to-bracket"></i>
                 </button>
@@ -303,12 +303,12 @@ async function copyAccessUrl(memberId, button) {
 	}
 }
 
-// --- JOIN ---
+// --- ACCESS ---
 
 // Embed the OpenVidu Meet component for the given room URL.
 // 'returnViewId' is the view to show again when the meeting is closed
 // (the home screen for anonymous access, the members screen for an identified guest).
-function joinRoom(roomUrl, returnViewId) {
+function accessRoom(roomUrl, returnViewId) {
 	// Hide the home and members screens and show the room screen
 	document.querySelector('#home').hidden = true;
 	document.querySelector('#members').hidden = true;

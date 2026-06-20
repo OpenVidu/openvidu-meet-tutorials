@@ -62,23 +62,23 @@ function getRoomListItemTemplate(room) {
             <div class="room-actions">
                 <button
                     class="btn btn-primary btn-sm"
-                    onclick="joinRoom(
+                    onclick="accessRoom(
                         '${room.roomName}',
                         '${room.access.anonymous.moderator.url}',
                         'moderator'
                     );"
                 >
-                    Join as Moderator
+                    Access as Moderator
                 </button>
                 <button
                     class="btn btn-secondary btn-sm"
-                    onclick="joinRoom(
+                    onclick="accessRoom(
                         '${room.roomName}',
                         '${room.access.anonymous.speaker.url}',
                         'speaker'
                     );"
                 >
-                    Join as Speaker
+                    Access as Speaker
                 </button>
                 <button
                     class="btn btn-success btn-sm"
@@ -142,8 +142,8 @@ async function deleteRoom(roomId) {
 	}
 }
 
-function joinRoom(roomName, roomUrl, role) {
-	console.log(`Joining room as ${role}`);
+function accessRoom(roomName, roomUrl, role) {
+	console.log(`Accessing room as ${role}`);
 
 	// Hide the home screen and show the room screen
 	const homeScreen = document.querySelector('#home');
@@ -151,7 +151,7 @@ function joinRoom(roomName, roomUrl, role) {
 	const roomScreen = document.querySelector('#room');
 	roomScreen.hidden = false;
 
-	// Hide the room header until the local participant joins
+	// Hide the room header until the local participant joins the meeting
 	const roomHeader = document.querySelector('#room-header');
 	roomHeader.hidden = true;
 
@@ -167,9 +167,9 @@ function joinRoom(roomName, roomUrl, role) {
 	// Add event listeners for the OpenVidu Meet component
 	const meet = document.querySelector('openvidu-meet');
 
-	// Event listener for when the local participant joins the room
+	// Event listener for when the local participant joins the meeting
 	meet.once('joined', () => {
-		console.log('Local participant joined the room');
+		console.log('Local participant joined the meeting');
 
 		// Show the room header with the room name
 		roomHeader.hidden = false;

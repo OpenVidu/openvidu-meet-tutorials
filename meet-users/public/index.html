@@ -93,7 +93,7 @@
 					<i class="fa-solid fa-arrow-left"></i>
 				</button>
 				<h2 id="members-room-name" class="text-primary"></h2>
-				<button class="btn btn-primary btn-sm" onclick="joinAsUser()">Join as user</button>
+				<button class="btn btn-primary btn-sm" onclick="accessAsUser()">Access as user</button>
 			</div>
 
 			<!-- Add member forms: a user (from the existing users) or an identified guest (by name) -->
@@ -133,16 +133,16 @@
 			</div>
 
 			<p class="members-hint text-muted">
-				<strong>Users</strong> join by clicking <strong>Join as user</strong> and logging in with their OpenVidu
-				Meet credentials (their User ID and password). <strong>Identified guests</strong> join through their own
-				unique link (use the join button next to each guest), with no login required.
+				<strong>Users</strong> access the room by clicking <strong>Access as user</strong> and logging in with their OpenVidu
+				Meet credentials (their User ID and password). <strong>Identified guests</strong> access the room through their own
+				unique link (use the access button next to each guest), with no login required.
 			</p>
 		</div>
 
 		<!-- ROOM VIEW -->
 		<div id="room" hidden>
 			<div id="meeting-container">
-				<!-- The OpenVidu Meet WebComponent will be inserted here when user joins a room -->
+				<!-- The OpenVidu Meet WebComponent will be inserted here when user accesses a room -->
 				<!-- <openvidu-meet room-url="..."></openvidu-meet>-->
 			</div>
 		</div>

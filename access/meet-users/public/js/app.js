@@ -55,14 +55,14 @@ function renderUsers() {
 
 function getUserListItemTemplate(user) {
 	return `
-        <li class="list-group-item">
-            <span><strong>${user.userId}</strong> · ${user.name}</span>
+        <li class="ov-list-item">
+            <span class="ov-list-item__name"><strong>${user.userId}</strong> · ${user.name}</span>
             <button
                 title="Delete user"
-                class="icon-button delete-button"
+                class="ov-icon-btn ov-icon-btn--danger"
                 onclick="deleteUser('${user.userId}');"
             >
-                <i class="fa-solid fa-trash"></i>
+                <span class="material-symbols-outlined">delete</span>
             </button>
         </li>
     `;
@@ -161,33 +161,38 @@ function renderRooms() {
 
 function getRoomListItemTemplate(room) {
 	return `
-        <li class="list-group-item">
-            <span>${room.roomName}</span>
-            <div class="room-actions">
+        <li class="ov-list-item">
+            <span class="ov-list-item__name">${room.roomName}</span>
+            <div class="ov-list-item__actions">
                 <button
-                    class="btn btn-primary btn-sm"
+                    title="Access as moderator"
+                    class="ov-btn ov-btn--primary ov-btn--sm"
                     onclick="accessRoom('${room.access.anonymous.moderator.url}', '#home');"
                 >
-                    Access as Moderator
+                    <span class="material-symbols-outlined">shield_person</span>
+                    Moderator
                 </button>
                 <button
-                    class="btn btn-secondary btn-sm"
+                    title="Access as speaker"
+                    class="ov-btn ov-btn--secondary ov-btn--sm"
                     onclick="accessRoom('${room.access.anonymous.speaker.url}', '#home');"
                 >
-                    Access as Speaker
+                    <span class="material-symbols-outlined">record_voice_over</span>
+                    Speaker
                 </button>
                 <button
-					class="btn btn-success btn-sm"
-					onclick="manageMembers('${room.roomId}');"
-				>
+                    class="ov-btn ov-btn--secondary ov-btn--sm"
+                    onclick="manageMembers('${room.roomId}');"
+                >
+                    <span class="material-symbols-outlined">group</span>
                     Members
                 </button>
                 <button
                     title="Delete room"
-                    class="icon-button delete-button"
+                    class="ov-icon-btn ov-icon-btn--danger"
                     onclick="deleteRoom('${room.roomId}');"
                 >
-                    <i class="fa-solid fa-trash"></i>
+                    <span class="material-symbols-outlined">delete</span>
                 </button>
             </div>
         </li>
@@ -334,40 +339,40 @@ function getMemberListItemTemplate(member) {
 		? `
                 <button
 					title="Copy access link"
-					class="icon-button"
+					class="ov-icon-btn"
 					onclick="copyAccessUrl('${member.memberId}', this)"
 				>
-                    <i class="fa-solid fa-copy"></i>
+                    <span class="material-symbols-outlined">content_copy</span>
                 </button>
                 <button
 					title="Access as ${member.name}"
-					class="icon-button"
+					class="ov-icon-btn"
 					onclick="accessRoom('${member.accessUrl}', '#members')"
 				>
-                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span class="material-symbols-outlined">login</span>
                 </button>`
 		: '';
 
 	return `
-        <li class="member-container">
-            <div class="member-info">
-                <p class="member-name">
+        <li class="ov-member">
+            <div class="ov-member__info">
+                <p class="ov-member__name">
                     ${member.name}
-                    <span class="badge ${isGuest ? 'bg-info' : 'bg-dark'}">${typeLabel}</span>
-                    <span class="badge ${member.baseRole === 'moderator' ? 'bg-primary' : 'bg-secondary'}">
+                    <span class="ov-badge ov-badge--${isGuest ? 'guest' : 'user'}">${typeLabel}</span>
+                    <span class="ov-badge ov-badge--${member.baseRole === 'moderator' ? 'moderator' : 'speaker'}">
                         ${member.baseRole}
                     </span>
                 </p>
-                <p class="member-url" title="${subtitle}">${subtitle}</p>
+                <p class="ov-member__url" title="${subtitle}">${subtitle}</p>
             </div>
-            <div class="member-actions">
+            <div class="ov-member__actions">
                 ${guestActions}
                 <button
 					title="Remove member"
-					class="icon-button delete-button"
+					class="ov-icon-btn ov-icon-btn--danger"
 					onclick="removeMember('${member.memberId}')"
 				>
-                    <i class="fa-solid fa-trash"></i>
+                    <span class="material-symbols-outlined">delete</span>
                 </button>
             </div>
         </li>
@@ -461,11 +466,10 @@ async function copyAccessUrl(memberId, button) {
 		await navigator.clipboard.writeText(member.accessUrl);
 
 		// Briefly show a confirmation icon
-		const icon = button.querySelector('i');
-		const previousClass = icon.className;
-		icon.className = 'fa-solid fa-check';
+		const icon = button.querySelector('.material-symbols-outlined');
+		icon.textContent = 'check';
 		setTimeout(() => {
-			icon.className = previousClass;
+			icon.textContent = 'content_copy';
 		}, 1500);
 	} catch (error) {
 		console.error('Error copying access link:', error.message);
@@ -490,9 +494,9 @@ function accessRoom(roomUrl, returnViewId) {
 	const roomScreen = document.querySelector('#room');
 	roomScreen.hidden = false;
 
-	// Inject the OpenVidu Meet component into the meeting container specifying the room URL
-	const meetingContainer = document.querySelector('#meeting-container');
-	meetingContainer.innerHTML = `
+	// Inject the OpenVidu Meet component into the meet container specifying the room URL
+	const meetContainer = document.querySelector('#meet-container');
+	meetContainer.innerHTML = `
         <openvidu-meet
             room-url="${roomUrl}"
         >
@@ -505,7 +509,7 @@ function accessRoom(roomUrl, returnViewId) {
 		console.log('OpenVidu Meet component closed');
 
 		// Clear the component and go back to the view we came from
-		meetingContainer.innerHTML = '';
+		meetContainer.innerHTML = '';
 		roomScreen.hidden = true;
 		document.querySelector(returnViewId).hidden = false;
 	});

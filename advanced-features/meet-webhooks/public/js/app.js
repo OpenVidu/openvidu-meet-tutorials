@@ -51,47 +51,52 @@ function renderRooms() {
 function getRoomListItemTemplate(room) {
 	const roomStatus = room.status === 'active_meeting' ? 'ACTIVE' : room.status === 'open' ? 'OPEN' : 'CLOSED';
 	const roomStatusBadgeClass =
-		room.status === 'active_meeting' ? 'bg-primary' : room.status === 'open' ? 'bg-success' : 'bg-warning';
+		room.status === 'active_meeting' ? 'ov-badge--active' : room.status === 'open' ? 'ov-badge--open' : 'ov-badge--closed';
 
 	return `
-        <li class="list-group-item">
-            <div class="room-info">
-                <span>${room.roomName}</span>
-                <span class="badge ${roomStatusBadgeClass}">${roomStatus}</span>
+        <li class="ov-list-item">
+            <div class="ov-list-item__meta">
+                <span class="ov-list-item__name">${room.roomName}</span>
+                <span class="ov-badge ${roomStatusBadgeClass}">${roomStatus}</span>
             </div>
-            <div class="room-actions">
+            <div class="ov-list-item__actions">
                 <button
-                    class="btn btn-primary btn-sm"
+                    title="Access as moderator"
+                    class="ov-btn ov-btn--primary ov-btn--sm"
                     onclick="accessRoom(
                         '${room.roomName}',
                         '${room.access.anonymous.moderator.url}',
                         'moderator'
                     );"
                 >
-                    Access as Moderator
+                    <span class="material-symbols-outlined">shield_person</span>
+                    Moderator
                 </button>
                 <button
-                    class="btn btn-secondary btn-sm"
+                    title="Access as speaker"
+                    class="ov-btn ov-btn--secondary ov-btn--sm"
                     onclick="accessRoom(
                         '${room.roomName}',
                         '${room.access.anonymous.speaker.url}',
                         'speaker'
                     );"
                 >
-                    Access as Speaker
+                    <span class="material-symbols-outlined">record_voice_over</span>
+                    Speaker
                 </button>
                 <button
-                    class="btn btn-success btn-sm"
+                    class="ov-btn ov-btn--secondary ov-btn--sm"
                     onclick="listRecordingsByRoom('${room.roomName}');"
                 >
+                    <span class="material-symbols-outlined">video_library</span>
                     View Recordings
                 </button>
                 <button
                     title="Delete room"
-                    class="icon-button delete-button"
+                    class="ov-icon-btn ov-icon-btn--danger"
                     onclick="deleteRoom('${room.roomId}');"
                 >
-                    <i class="fa-solid fa-trash"></i>
+                    <span class="material-symbols-outlined">delete</span>
                 </button>
             </div>
         </li>
@@ -155,9 +160,9 @@ function accessRoom(roomName, roomUrl, role) {
 	const roomHeader = document.querySelector('#room-header');
 	roomHeader.hidden = true;
 
-	// Inject the OpenVidu Meet component into the meeting container specifying the room URL
-	const meetingContainer = document.querySelector('#meeting-container');
-	meetingContainer.innerHTML = `
+	// Inject the OpenVidu Meet component into the meet container specifying the room URL
+	const meetContainer = document.querySelector('#meet-container');
+	meetContainer.innerHTML = `
         <openvidu-meet 
             room-url="${roomUrl}"
         >
@@ -303,20 +308,20 @@ function getRecordingListItemTemplate(recording) {
 	const size = recording.size ? formatBytes(recording.size ?? 0) : '-';
 
 	return `
-        <li class="recording-container">
-            <i class="fa-solid fa-file-video"></i>
-            <div class="recording-info">
-                <p class="recording-name">${roomName}</p>
-                <p><span class="recording-info-tag">Start date: </span><span class="recording-info-value">${startDate}</span></p>
-                <p><span class="recording-info-tag">Duration: </span><span class="recording-info-value">${duration}</span></p>
-                <p><span class="recording-info-tag">Size: </span><span class="recording-info-value">${size}</span></p>
+        <li class="ov-recording">
+            <span class="material-symbols-outlined ov-recording__icon">video_file</span>
+            <div class="ov-recording__info">
+                <p class="ov-recording__name">${roomName}</p>
+                <p><span class="ov-recording__tag">Start date: </span><span class="ov-recording__value">${startDate}</span></p>
+                <p><span class="ov-recording__tag">Duration: </span><span class="ov-recording__value">${duration}</span></p>
+                <p><span class="ov-recording__tag">Size: </span><span class="ov-recording__value">${size}</span></p>
             </div>
-            <div class="recording-actions">
-                <button title="Play" class="icon-button" onclick="displayRecording('${recordingId}')">
-                    <i class="fa-solid fa-play"></i>
+            <div class="ov-recording__actions">
+                <button title="Play" class="ov-icon-btn" onclick="displayRecording('${recordingId}')">
+                    <span class="material-symbols-outlined">play_arrow</span>
                 </button>
-                <button title="Delete recording" class="icon-button delete-button" onclick="deleteRecording('${recordingId}')">
-                    <i class="fa-solid fa-trash"></i>
+                <button title="Delete recording" class="ov-icon-btn ov-icon-btn--danger" onclick="deleteRecording('${recordingId}')">
+                    <span class="material-symbols-outlined">delete</span>
                 </button>
             </div>
         </li>

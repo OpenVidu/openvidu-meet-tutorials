@@ -1,74 +1,90 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 	<head>
-		<title>OpenVidu Meet WebComponent - Commands & Events Tutorial</title>
+		<title>OpenVidu Meet | Commands & Events Tutorial</title>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+		/>
 		<link rel="stylesheet" href="css/styles.css" />
 	</head>
 	<body>
+		<!-- TOP APP BAR -->
+		<header class="ov-appbar">
+			<img class="ov-appbar__logo" src="images/meet_logo.png" alt="OpenVidu Meet" />
+			<span class="ov-appbar__divider"></span>
+			<span class="ov-appbar__tag">Commands & Events Tutorial</span>
+		</header>
+
 		<!-- HOME VIEW -->
-		<div id="home" class="container">
-			<!-- Rooms list section -->
-			<div id="rooms-container">
-				<div id="rooms-header">
-					<h2 class="text-center text-primary">Access a Room</h2>
-				</div>
+		<main id="home" class="ov-page">
+			<div class="ov-panels">
+				<!-- Rooms list section -->
+				<section id="rooms-container" class="ov-card">
+					<h2 class="ov-card__title">Access a Room</h2>
 
-				<div id="rooms-list">
-					<!-- Message when there are no rooms or an error occurs while loading -->
-					<p id="no-rooms-or-error" class="text-muted text-center" hidden></p>
+					<div id="rooms-list" class="ov-card__body">
+						<!-- Message when there are no rooms or an error occurs while loading -->
+						<p id="no-rooms-or-error" class="ov-muted" hidden></p>
 
-					<ul class="list-group">
-						<!-- Rooms will be dynamically added here -->
-					</ul>
-				</div>
-			</div>
-
-			<!-- Create room section -->
-			<div id="create-room">
-				<h2 class="text-center text-primary">Create a New Room</h2>
-
-				<form onsubmit="createRoom(event)">
-					<div class="mb-3">
-						<label for="room-name" class="form-label">Room name</label>
-						<input
-							type="text"
-							name="roomName"
-							id="room-name"
-							class="form-control"
-							placeholder="Example Room"
-							required
-						/>
+						<ul class="ov-list">
+							<!-- Rooms will be dynamically added here -->
+						</ul>
 					</div>
+				</section>
 
-					<!-- Error message -->
-					<div id="create-room-error" class="alert alert-danger" hidden></div>
+				<!-- Create room section -->
+				<section id="create-room" class="ov-card">
+					<h2 class="ov-card__title">Create a New Room</h2>
 
-					<button type="submit" class="btn btn-primary w-100">Create Room</button>
-				</form>
+					<form onsubmit="createRoom(event)">
+						<div class="ov-field">
+							<label for="room-name" class="ov-label">Room name</label>
+							<input
+								type="text"
+								name="roomName"
+								id="room-name"
+								class="ov-input"
+								placeholder="Example Room"
+								required
+							/>
+						</div>
+
+						<!-- Error message -->
+						<div id="create-room-error" class="ov-alert ov-alert--error" hidden></div>
+
+						<button type="submit" class="ov-btn ov-btn--primary ov-btn--block">Create Room</button>
+					</form>
+				</section>
 			</div>
-		</div>
+		</main>
 
 		<!-- ROOM VIEW -->
-		<div id="room" hidden>
+		<main id="room" class="ov-room-view" hidden>
 			<!-- Header section with room name and end meeting button (only visible for moderators) -->
-			<div id="room-header" class="border-bottom border-primary bg-light px-3 shadow-sm" hidden>
-				<h4 id="room-name-header" class="text-primary fw-semibold m-0"></h4>
-				<button id="end-meeting-btn" class="btn btn-danger btn-sm" hidden>End Meeting</button>
+			<div id="room-header" class="ov-room-header" hidden>
+				<span id="room-name-header" class="ov-room-header__name"></span>
+				<button id="end-meeting-btn" class="ov-btn ov-btn--danger ov-btn--sm" hidden>
+					<span class="material-symbols-outlined">call_end</span>
+					End meeting
+				</button>
 			</div>
 
-			<div id="meeting-container">
-				<!-- The OpenVidu Meet WebComponent will be inserted here when user accesses a room -->
-				<!-- <openvidu-meet room-url="..."></openvidu-meet>-->
+			<div id="meet-container">
+				<!-- The OpenVidu Meet WebComponent will be inserted here when a participant accesses the room -->
 			</div>
-		</div>
+		</main>
 
 		<script src="js/app.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 		<!-- OpenVidu Meet WebComponent bundle -->
 		<script src="http://localhost:9080/meet/v1/openvidu-meet.js"></script>
 	</body>

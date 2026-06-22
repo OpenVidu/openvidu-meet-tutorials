@@ -47,35 +47,39 @@ function renderRooms() {
 
 function getRoomListItemTemplate(room) {
 	return `
-        <li class="list-group-item">
-            <span>${room.roomName}</span>
-            <div class="room-actions">
+        <li class="ov-list-item">
+            <span class="ov-list-item__name">${room.roomName}</span>
+            <div class="ov-list-item__actions">
                 <button
-                    class="btn btn-primary btn-sm"
+                    title="Access as moderator"
+                    class="ov-btn ov-btn--primary ov-btn--sm"
                     onclick="accessRoom(
-                        '${room.roomName}', 
-                        '${room.access.anonymous.moderator.url}', 
+                        '${room.roomName}',
+                        '${room.access.anonymous.moderator.url}',
                         'moderator'
                     );"
                 >
-                    Access as Moderator
+                    <span class="material-symbols-outlined">shield_person</span>
+                    Moderator
                 </button>
                 <button
-                    class="btn btn-secondary btn-sm"
+                    title="Access as speaker"
+                    class="ov-btn ov-btn--secondary ov-btn--sm"
                     onclick="accessRoom(
-                        '${room.roomName}', 
-                        '${room.access.anonymous.speaker.url}', 
+                        '${room.roomName}',
+                        '${room.access.anonymous.speaker.url}',
                         'speaker'
                     );"
                 >
-                    Access as Speaker
+                    <span class="material-symbols-outlined">record_voice_over</span>
+                    Speaker
                 </button>
-                <button 
+                <button
                     title="Delete room"
-                    class="icon-button delete-button"
+                    class="ov-icon-btn ov-icon-btn--danger"
                     onclick="deleteRoom('${room.roomId}');"
                 >
-                    <i class="fa-solid fa-trash"></i>
+                    <span class="material-symbols-outlined">delete</span>
                 </button>
             </div>
         </li>
@@ -139,9 +143,9 @@ function accessRoom(roomName, roomUrl, role) {
 	const roomHeader = document.querySelector('#room-header');
 	roomHeader.hidden = true;
 
-	// Inject the OpenVidu Meet component into the meeting container specifying the room URL
-	const meetingContainer = document.querySelector('#meeting-container');
-	meetingContainer.innerHTML = `
+	// Inject the OpenVidu Meet component into the meet container specifying the room URL
+	const meetContainer = document.querySelector('#meet-container');
+	meetContainer.innerHTML = `
         <openvidu-meet 
             room-url="${roomUrl}"
         >

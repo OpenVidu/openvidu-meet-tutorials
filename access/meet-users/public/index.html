@@ -1,154 +1,175 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 	<head>
-		<title>OpenVidu Meet Users Tutorial</title>
+		<title>OpenVidu Meet | Users Tutorial</title>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+		/>
 		<link rel="stylesheet" href="css/styles.css" />
 	</head>
 	<body>
+		<!-- TOP APP BAR -->
+		<header class="ov-appbar">
+			<img class="ov-appbar__logo" src="images/meet_logo.png" alt="OpenVidu Meet" />
+			<span class="ov-appbar__divider"></span>
+			<span class="ov-appbar__tag">Users Tutorial</span>
+		</header>
+
 		<!-- HOME VIEW -->
-		<div id="home" class="container">
-			<!-- Users panel -->
-			<div class="panel">
-				<h2 class="text-center text-primary">Users</h2>
+		<main id="home" class="ov-page">
+			<div class="ov-panels">
+				<!-- Users panel -->
+				<section class="ov-card ov-panel">
+					<h2 class="ov-card__title">Users</h2>
 
-				<div class="panel-list">
-					<!-- Message when there are no users or an error occurs while loading -->
-					<p id="no-users-or-error" class="text-muted text-center" hidden></p>
+					<div class="ov-card__body">
+						<!-- Message when there are no users or an error occurs while loading -->
+						<p id="no-users-or-error" class="ov-muted" hidden></p>
 
-					<ul id="users-list" class="list-group">
-						<!-- Users will be dynamically added here -->
-					</ul>
-				</div>
-
-				<form class="panel-form" onsubmit="createUser(event)">
-					<div class="mb-2">
-						<input
-							type="text"
-							id="user-id"
-							class="form-control"
-							placeholder="User ID (e.g. alice)"
-							minlength="5"
-							maxlength="20"
-							pattern="[a-z0-9_]+"
-							title="5-20 characters: lowercase letters, numbers and underscores only"
-							required
-						/>
-					</div>
-					<div class="mb-2">
-						<input type="text" id="user-name" class="form-control" placeholder="Name (e.g. Alice Smith)" required />
-					</div>
-					<div class="mb-2">
-						<input
-							type="password"
-							id="user-password"
-							class="form-control"
-							placeholder="Password (min 5 chars)"
-							minlength="5"
-							required
-						/>
+						<ul id="users-list" class="ov-list">
+							<!-- Users will be dynamically added here -->
+						</ul>
 					</div>
 
-					<!-- Error message -->
-					<div id="create-user-error" class="alert alert-danger" hidden></div>
+					<form class="ov-subform" onsubmit="createUser(event)">
+						<div class="ov-field">
+							<input
+								type="text"
+								id="user-id"
+								class="ov-input"
+								placeholder="User ID (e.g. alice)"
+								minlength="5"
+								maxlength="20"
+								pattern="[a-z0-9_]+"
+								title="5-20 characters: lowercase letters, numbers and underscores only"
+								required
+							/>
+						</div>
+						<div class="ov-field">
+							<input type="text" id="user-name" class="ov-input" placeholder="Name (e.g. Alice Smith)" required />
+						</div>
+						<div class="ov-field">
+							<input
+								type="password"
+								id="user-password"
+								class="ov-input"
+								placeholder="Password (min 5 chars)"
+								minlength="5"
+								required
+							/>
+						</div>
 
-					<button type="submit" class="btn btn-primary w-100">Create User</button>
-				</form>
+						<!-- Error message -->
+						<div id="create-user-error" class="ov-alert ov-alert--error" hidden></div>
+
+						<button type="submit" class="ov-btn ov-btn--primary ov-btn--block">Create User</button>
+					</form>
+				</section>
+
+				<!-- Rooms panel -->
+				<section class="ov-card ov-panel">
+					<h2 class="ov-card__title">Rooms</h2>
+
+					<div class="ov-card__body">
+						<!-- Message when there are no rooms or an error occurs while loading -->
+						<p id="no-rooms-or-error" class="ov-muted" hidden></p>
+
+						<ul id="rooms-list" class="ov-list">
+							<!-- Rooms will be dynamically added here -->
+						</ul>
+					</div>
+
+					<form class="ov-subform" onsubmit="createRoom(event)">
+						<div class="ov-field">
+							<input type="text" id="room-name" class="ov-input" placeholder="Room name" required />
+						</div>
+
+						<!-- Error message -->
+						<div id="create-room-error" class="ov-alert ov-alert--error" hidden></div>
+
+						<button type="submit" class="ov-btn ov-btn--primary ov-btn--block">Create Room</button>
+					</form>
+				</section>
 			</div>
-
-			<!-- Rooms panel -->
-			<div class="panel">
-				<h2 class="text-center text-primary">Rooms</h2>
-
-				<div class="panel-list">
-					<!-- Message when there are no rooms or an error occurs while loading -->
-					<p id="no-rooms-or-error" class="text-muted text-center" hidden></p>
-
-					<ul id="rooms-list" class="list-group">
-						<!-- Rooms will be dynamically added here -->
-					</ul>
-				</div>
-
-				<form class="panel-form" onsubmit="createRoom(event)">
-					<div class="mb-2">
-						<input type="text" id="room-name" class="form-control" placeholder="Room name" required />
-					</div>
-
-					<!-- Error message -->
-					<div id="create-room-error" class="alert alert-danger" hidden></div>
-
-					<button type="submit" class="btn btn-primary w-100">Create Room</button>
-				</form>
-			</div>
-		</div>
+		</main>
 
 		<!-- MEMBERS VIEW -->
-		<div id="members" hidden>
-			<div id="members-header">
-				<button class="icon-button" title="Back" onclick="backToHome()">
-					<i class="fa-solid fa-arrow-left"></i>
-				</button>
-				<h2 id="members-room-name" class="text-primary"></h2>
-				<button class="btn btn-primary btn-sm" onclick="accessAsUser()">Access as user</button>
-			</div>
+		<main id="members" class="ov-page" hidden>
+			<section class="ov-card ov-subscreen">
+				<header id="members-header" class="ov-subscreen__header">
+					<button class="ov-icon-btn" title="Back" onclick="backToHome()">
+						<span class="material-symbols-outlined">arrow_back</span>
+					</button>
+					<h2 id="members-room-name" class="ov-subscreen__title"></h2>
+					<button id="access-as-user-btn" class="ov-btn ov-btn--primary ov-btn--sm" onclick="accessAsUser()">
+						<span class="material-symbols-outlined">login</span>
+						Access as user
+					</button>
+				</header>
 
-			<!-- Add member forms: a user (from the existing users) or an identified guest (by name) -->
-			<div id="add-member-forms">
-				<form class="add-member-form" onsubmit="addUser(event)">
-					<select id="member-user" class="form-select" required>
-						<!-- Users will be dynamically added here -->
-					</select>
-					<select id="member-user-role" class="form-select">
-						<option value="speaker">Speaker</option>
-						<option value="moderator">Moderator</option>
-					</select>
-					<button type="submit" class="btn btn-success">Add user</button>
-				</form>
+				<!-- Add member forms: a user (from the existing users) or an identified guest (by name) -->
+				<div id="add-member-forms" class="ov-forms">
+					<form class="ov-form-row" onsubmit="addUser(event)">
+						<select id="member-user" class="ov-select" required>
+							<!-- Users will be dynamically added here -->
+						</select>
+						<select id="member-user-role" class="ov-select">
+							<option value="speaker">Speaker</option>
+							<option value="moderator">Moderator</option>
+						</select>
+						<button type="submit" class="ov-btn ov-btn--primary">Add user</button>
+					</form>
 
-				<form class="add-member-form" onsubmit="addGuest(event)">
-					<input type="text" id="guest-name" class="form-control" placeholder="Guest name (e.g. Charlie)" required />
-					<select id="guest-role" class="form-select">
-						<option value="speaker">Speaker</option>
-						<option value="moderator">Moderator</option>
-					</select>
-					<button type="submit" class="btn btn-success">Add guest</button>
-				</form>
-			</div>
+					<form class="ov-form-row" onsubmit="addGuest(event)">
+						<input type="text" id="guest-name" class="ov-input" placeholder="Guest name (e.g. Charlie)" required />
+						<select id="guest-role" class="ov-select">
+							<option value="speaker">Speaker</option>
+							<option value="moderator">Moderator</option>
+						</select>
+						<button type="submit" class="ov-btn ov-btn--primary">Add guest</button>
+					</form>
+				</div>
 
-			<!-- Error message -->
-			<div id="add-member-error" class="alert alert-danger" hidden></div>
+				<!-- Error message -->
+				<div id="add-member-error" class="ov-alert ov-alert--error" hidden></div>
 
-			<!-- Members list -->
-			<div id="members-list">
-				<!-- Message when there are no members or an error occurs while loading -->
-				<p id="no-members-or-error" class="text-muted text-center" hidden></p>
+				<!-- Members list -->
+				<div id="members-list" class="ov-card__body">
+					<!-- Message when there are no members or an error occurs while loading -->
+					<p id="no-members-or-error" class="ov-muted" hidden></p>
 
-				<ul class="list-group">
-					<!-- Members will be dynamically added here -->
-				</ul>
-			</div>
+					<ul class="ov-list">
+						<!-- Members will be dynamically added here -->
+					</ul>
+				</div>
 
-			<p class="members-hint text-muted">
-				<strong>Users</strong> access the room by clicking <strong>Access as user</strong> and logging in with their OpenVidu
-				Meet credentials (their User ID and password). <strong>Identified guests</strong> access the room through their own
-				unique link (use the access button next to each guest), with no login required.
-			</p>
-		</div>
+				<p class="ov-hint">
+					<strong>Users</strong> access the room by clicking <strong>Access as user</strong> and logging in with their OpenVidu
+					Meet credentials (their User ID and password). <strong>Identified guests</strong> access the room through their own
+					unique link (use the access button next to each guest), with no login required.
+				</p>
+			</section>
+		</main>
 
 		<!-- ROOM VIEW -->
-		<div id="room" hidden>
-			<div id="meeting-container">
+		<main id="room" class="ov-room-view" hidden>
+			<div id="meet-container">
 				<!-- The OpenVidu Meet WebComponent will be inserted here when user accesses a room -->
 				<!-- <openvidu-meet room-url="..."></openvidu-meet>-->
 			</div>
-		</div>
+		</main>
 
 		<script src="js/app.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 		<!-- OpenVidu Meet WebComponent bundle -->
 		<script src="http://localhost:9080/meet/v1/openvidu-meet.js"></script>
 	</body>

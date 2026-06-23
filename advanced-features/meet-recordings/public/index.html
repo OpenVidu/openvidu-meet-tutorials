@@ -11,10 +11,7 @@
 			rel="stylesheet"
 			href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap"
 		/>
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-		/>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
 		<link rel="stylesheet" href="css/styles.css" />
 	</head>
 	<body>
@@ -30,7 +27,9 @@
 			<div class="ov-panels">
 				<!-- Rooms list section -->
 				<section id="rooms-container" class="ov-card">
-					<h2 class="ov-card__title">Access a Room</h2>
+					<h2 class="ov-card__title">
+						<span class="material-symbols-outlined ov-icon--rooms">video_chat</span>Rooms
+					</h2>
 
 					<div id="rooms-list" class="ov-card__body">
 						<!-- Message when there are no rooms or an error occurs while loading -->
@@ -44,7 +43,9 @@
 
 				<!-- Create room section -->
 				<section id="create-room" class="ov-card">
-					<h2 class="ov-card__title">Create a New Room</h2>
+					<h2 class="ov-card__title">
+						<span class="material-symbols-outlined ov-icon--rooms">add</span>Create a new room
+					</h2>
 
 					<form onsubmit="createRoom(event)">
 						<div class="ov-field">
@@ -54,7 +55,7 @@
 								name="roomName"
 								id="room-name"
 								class="ov-input"
-								placeholder="Example Room"
+								placeholder="e.g. Example Room"
 								required
 							/>
 						</div>
@@ -80,8 +81,7 @@
 			</div>
 
 			<div id="meet-container">
-				<!-- The OpenVidu Meet WebComponent will be inserted here when user accesses a room -->
-				<!-- <openvidu-meet room-url="..."></openvidu-meet>-->
+				<!-- The OpenVidu Meet WebComponent will be inserted here when an individual accesses a room -->
 			</div>
 		</main>
 
@@ -89,7 +89,12 @@
 		<main id="recordings" class="ov-page" hidden>
 			<section class="ov-card ov-subscreen ov-subscreen--wide">
 				<header class="ov-subscreen__header">
-					<h2 class="ov-subscreen__title">Recordings</h2>
+					<button class="ov-icon-btn" title="Back" onclick="backToHome()">
+						<span class="material-symbols-outlined">arrow_back</span>
+					</button>
+					<h2 class="ov-subscreen__title">
+						<span class="material-symbols-outlined ov-icon--recordings">video_library</span>Recordings
+					</h2>
 					<button id="refresh-recordings" class="ov-icon-btn" title="Refresh" onclick="listRecordings()">
 						<span class="material-symbols-outlined">refresh</span>
 					</button>
@@ -115,8 +120,7 @@
 
 		<!-- DISPLAY RECORDING VIEW -->
 		<main id="display-recording" class="ov-room-view" hidden>
-			<!-- The OpenVidu Meet WebComponent will be inserted here when user displays a recording -->
-			<!-- <openvidu-meet recording-url="..."></openvidu-meet>-->
+			<!-- The OpenVidu Meet WebComponent will be inserted here when an individual displays a recording -->
 		</main>
 
 		<script src="js/app.js"></script>

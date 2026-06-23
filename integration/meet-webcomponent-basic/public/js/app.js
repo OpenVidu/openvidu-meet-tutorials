@@ -93,8 +93,8 @@ async function createRoom(e) {
 			roomName
 		});
 
-		// Add new room to the list
-		rooms.set(room.roomId, room);
+		// Add the new room to the start (the API returns rooms newest first)
+		prependToMap(rooms, room.roomId, room);
 		renderRooms();
 
 		// Reset the form
@@ -137,6 +137,14 @@ function accessRoom(roomUrl) {
         >
         </openvidu-meet>
     `;
+}
+
+// Adds an entry to the start of a Map so newly created items appear first,
+// matching the OpenVidu Meet API order (items are returned newest first)
+function prependToMap(map, key, value) {
+	const entries = [[key, value], ...map];
+	map.clear();
+	entries.forEach(([k, v]) => map.set(k, v));
 }
 
 // Function to make HTTP requests to the backend

@@ -74,7 +74,7 @@ function getRoomListItemTemplate(room) {
                     Speaker
                 </button>
                 <button
-                    class="ov-btn ov-btn--secondary ov-btn--sm"
+                    class="ov-btn ov-btn--users ov-btn--sm"
                     onclick="manageMembers('${room.roomId}');"
                 >
                     <span class="material-symbols-outlined">group</span>
@@ -107,8 +107,8 @@ async function createRoom(e) {
 			roomName
 		});
 
-		// Add new room to the list
-		rooms.set(room.roomId, room);
+		// Add the new room to the start (the API returns rooms newest first)
+		prependToMap(rooms, room.roomId, room);
 		renderRooms();
 
 		// Reset the form
@@ -209,6 +209,7 @@ function getMemberListItemTemplate(member) {
                 <p class="ov-member__name">
                     ${member.name}
                     <span class="ov-badge ov-badge--${member.baseRole === 'moderator' ? 'moderator' : 'speaker'}">
+                        <span class="material-symbols-outlined">${member.baseRole === 'moderator' ? 'shield_person' : 'record_voice_over'}</span>
                         ${member.baseRole}
                     </span>
                 </p>
@@ -260,8 +261,8 @@ async function addGuest(e) {
 			baseRole
 		});
 
-		// Add new member to the list
-		members.set(member.memberId, member);
+		// Add the new member to the start (the API returns members newest first)
+		prependToMap(members, member.memberId, member);
 		renderMembers();
 
 		// Reset the form
@@ -338,6 +339,14 @@ function accessRoom(roomUrl, returnViewId) {
 		roomScreen.hidden = true;
 		document.querySelector(returnViewId).hidden = false;
 	});
+}
+
+// Adds an entry to the start of a Map so newly created items appear first,
+// matching the OpenVidu Meet API order (items are returned newest first)
+function prependToMap(map, key, value) {
+	const entries = [[key, value], ...map];
+	map.clear();
+	entries.forEach(([k, v]) => map.set(k, v));
 }
 
 // Function to make HTTP requests to the backend

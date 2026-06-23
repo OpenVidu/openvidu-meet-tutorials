@@ -49,15 +49,24 @@ function renderRooms() {
 }
 
 function getRoomListItemTemplate(room) {
-	const roomStatus = room.status === 'active_meeting' ? 'ACTIVE' : room.status === 'open' ? 'OPEN' : 'CLOSED';
+	const roomStatus = room.status === 'active_meeting' ? 'ACTIVE MEETING' : room.status === 'open' ? 'OPEN' : 'CLOSED';
 	const roomStatusBadgeClass =
-		room.status === 'active_meeting' ? 'ov-badge--active' : room.status === 'open' ? 'ov-badge--open' : 'ov-badge--closed';
+		room.status === 'active_meeting'
+			? 'ov-badge--active'
+			: room.status === 'open'
+				? 'ov-badge--open'
+				: 'ov-badge--closed';
+	const roomStatusIcon =
+		room.status === 'active_meeting' ? 'videocam' : room.status === 'open' ? 'meeting_room' : 'lock';
 
 	return `
         <li class="ov-list-item">
             <div class="ov-list-item__meta">
                 <span class="ov-list-item__name">${room.roomName}</span>
-                <span class="ov-badge ${roomStatusBadgeClass}">${roomStatus}</span>
+                <span class="ov-badge ${roomStatusBadgeClass}">
+                    <span class="material-symbols-outlined">${roomStatusIcon}</span>
+                    ${roomStatus}
+                </span>
             </div>
             <div class="ov-list-item__actions">
                 <button
@@ -85,7 +94,7 @@ function getRoomListItemTemplate(room) {
                     Speaker
                 </button>
                 <button
-                    class="ov-btn ov-btn--secondary ov-btn--sm"
+                    class="ov-btn ov-btn--recordings ov-btn--sm"
                     onclick="listRecordingsByRoom('${room.roomName}');"
                 >
                     <span class="material-symbols-outlined">video_library</span>
@@ -119,8 +128,8 @@ async function createRoom(e) {
 			roomName
 		});
 
-		// Add new room to the list
-		rooms.set(room.roomId, room);
+		// Add the new room to the start (the API returns rooms newest first)
+		prependToMap(rooms, room.roomId, room);
 		renderRooms();
 
 		// Reset the form
@@ -230,6 +239,14 @@ async function listRecordingsByRoom(roomName) {
 	await listRecordings();
 }
 
+function backToHome() {
+	// Hide the recordings screen and show the home screen
+	const recordingsScreen = document.querySelector('#recordings');
+	recordingsScreen.hidden = true;
+	const homeScreen = document.querySelector('#home');
+	homeScreen.hidden = false;
+}
+
 async function listRecordings(e) {
 	if (e) {
 		// Prevent the default form submission
@@ -241,9 +258,7 @@ async function listRecordings(e) {
 	const recordingsUrl = '/recordings' + (roomName ? `?room=${roomName}` : '');
 
 	try {
-		let { recordings: recordingsList } = await httpRequest('GET', recordingsUrl);
-		// Filter completed recordings
-		recordingsList = filterCompletedRecordings(recordingsList);
+		const { recordings: recordingsList } = await httpRequest('GET', recordingsUrl);
 
 		// Clear the previous recordings and populate the new ones
 		recordings.clear();
@@ -259,10 +274,6 @@ async function listRecordings(e) {
 		recordingsErrorElement.textContent = 'Error loading recordings';
 		recordingsErrorElement.hidden = false;
 	}
-}
-
-function filterCompletedRecordings(recordingList) {
-	return recordingList.filter((recording) => recording.status === 'complete');
 }
 
 function renderRecordings() {
@@ -281,22 +292,10 @@ function renderRecordings() {
 		noRecordingsElement.hidden = true;
 	}
 
-	// Sort recordings by start date in ascending order
-	const recordingsArray = Array.from(recordings.values());
-	const sortedRecordings = sortRecordingsByDate(recordingsArray);
-
 	// Add recordings to the list element
-	sortedRecordings.forEach((recording) => {
+	Array.from(recordings.values()).forEach((recording) => {
 		const recordingItem = getRecordingListItemTemplate(recording);
 		recordingsList.innerHTML += recordingItem;
-	});
-}
-
-function sortRecordingsByDate(recordings) {
-	return recordings.sort((a, b) => {
-		const dateA = new Date(a.startDate || -1);
-		const dateB = new Date(b.startDate || -1);
-		return dateA.getTime() - dateB.getTime();
 	});
 }
 
@@ -349,10 +348,9 @@ async function displayRecording(recordingId) {
 	// Add event listener for when the OpenVidu Meet component is closed
 	const meet = document.querySelector('openvidu-meet');
 	meet.once('closed', () => {
-		// Hide the display recording screen and show the home screen
+		// Hide the display recording screen and show the recordings screen
 		displayRecordingScreen.hidden = true;
-		const homeScreen = document.querySelector('#home');
-		homeScreen.hidden = false;
+		recordingsScreen.hidden = false;
 	});
 }
 
@@ -408,27 +406,28 @@ function handleWebhookNotification(webhookData) {
 
 	switch (event) {
 		case 'meetingStarted':
-			// Update rooms map with updated room info and re-render if on home screen
-			if (isOnHomeScreen()) {
-				rooms.set(data.roomId, data);
-				renderRooms();
-			}
-			break;
 		case 'meetingEnded':
-			// Update rooms map with updated room info and re-render if on home screen
-			if (isOnHomeScreen()) {
-				rooms.set(data.roomId, data);
-				renderRooms();
-			}
+			// Always update the room in the map and refresh the list,
+			// so the home view shows the current status
+			rooms.set(data.roomId, data);
+			renderRooms();
 			break;
 		case 'recordingEnded':
 			// Add recording to list and re-render if on recordings screen
 			if (isOnRecordingsScreen(data.roomName)) {
-				recordings.set(data.recordingId, data);
+				prependToMap(recordings, data.recordingId, data);
 				renderRecordings();
 			}
 			break;
 	}
+}
+
+// Adds an entry to the start of a Map so newly created items appear first,
+// matching the OpenVidu Meet API order (items are returned newest first)
+function prependToMap(map, key, value) {
+	const entries = [[key, value], ...map];
+	map.clear();
+	entries.forEach(([k, v]) => map.set(k, v));
 }
 
 // Function to make HTTP requests to the backend
@@ -474,12 +473,7 @@ function formatBytes(bytes) {
 	return (bytes / Math.pow(k, i)).toFixed(decimals) + sizes[i];
 }
 
-// Helper functions to detect current screen
-function isOnHomeScreen() {
-	const homeScreen = document.querySelector('#home');
-	return homeScreen && !homeScreen.hidden;
-}
-
+// Helper to detect whether the recordings view is currently shown
 function isOnRecordingsScreen(roomName) {
 	const recordingsScreen = document.querySelector('#recordings');
 	if (!recordingsScreen || recordingsScreen.hidden) {
@@ -489,5 +483,5 @@ function isOnRecordingsScreen(roomName) {
 	// Check if the room filter matches room name
 	const roomSearchInput = document.querySelector('#recordings-room-search');
 	const roomFilter = roomSearchInput ? roomSearchInput.value.trim() : '';
-	return !roomFilter || roomName.startsWith(roomFilter);
+	return !roomFilter || roomName === roomFilter;
 }

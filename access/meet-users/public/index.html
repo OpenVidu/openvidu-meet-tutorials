@@ -11,10 +11,7 @@
 			rel="stylesheet"
 			href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap"
 		/>
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-		/>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
 		<link rel="stylesheet" href="css/styles.css" />
 	</head>
 	<body>
@@ -30,7 +27,9 @@
 			<div class="ov-panels">
 				<!-- Users panel -->
 				<section class="ov-card ov-panel">
-					<h2 class="ov-card__title">Users</h2>
+					<h2 class="ov-card__title">
+						<span class="material-symbols-outlined ov-icon--users">group</span>Users
+					</h2>
 
 					<div class="ov-card__body">
 						<!-- Message when there are no users or an error occurs while loading -->
@@ -41,13 +40,20 @@
 						</ul>
 					</div>
 
-					<form class="ov-subform" onsubmit="createUser(event)">
+					<details class="ov-subform">
+						<summary class="ov-subform__title">
+							<span class="material-symbols-outlined ov-icon--users">person_add</span>
+							Create a new user
+							<span class="material-symbols-outlined ov-subform__chevron">expand_more</span>
+						</summary>
+						<form class="ov-subform__body" onsubmit="createUser(event)">
 						<div class="ov-field">
+							<label class="ov-label" for="user-id">User ID</label>
 							<input
 								type="text"
 								id="user-id"
 								class="ov-input"
-								placeholder="User ID (e.g. alice)"
+								placeholder="e.g. alice"
 								minlength="5"
 								maxlength="20"
 								pattern="[a-z0-9_]+"
@@ -56,14 +62,22 @@
 							/>
 						</div>
 						<div class="ov-field">
-							<input type="text" id="user-name" class="ov-input" placeholder="Name (e.g. Alice Smith)" required />
+							<label class="ov-label" for="user-name">Name</label>
+							<input
+								type="text"
+								id="user-name"
+								class="ov-input"
+								placeholder="e.g. Alice Smith"
+								required
+							/>
 						</div>
 						<div class="ov-field">
+							<label class="ov-label" for="user-password">Password</label>
 							<input
 								type="password"
 								id="user-password"
 								class="ov-input"
-								placeholder="Password (min 5 chars)"
+								placeholder="Min 5 characters"
 								minlength="5"
 								required
 							/>
@@ -72,13 +86,16 @@
 						<!-- Error message -->
 						<div id="create-user-error" class="ov-alert ov-alert--error" hidden></div>
 
-						<button type="submit" class="ov-btn ov-btn--primary ov-btn--block">Create User</button>
+						<button type="submit" class="ov-btn ov-btn--users ov-btn--block">Create User</button>
 					</form>
+					</details>
 				</section>
 
 				<!-- Rooms panel -->
 				<section class="ov-card ov-panel">
-					<h2 class="ov-card__title">Rooms</h2>
+					<h2 class="ov-card__title">
+						<span class="material-symbols-outlined ov-icon--rooms">video_chat</span>Rooms
+					</h2>
 
 					<div class="ov-card__body">
 						<!-- Message when there are no rooms or an error occurs while loading -->
@@ -89,9 +106,22 @@
 						</ul>
 					</div>
 
-					<form class="ov-subform" onsubmit="createRoom(event)">
+					<details class="ov-subform">
+						<summary class="ov-subform__title">
+							<span class="material-symbols-outlined ov-icon--rooms">add</span>
+							Create a new room
+							<span class="material-symbols-outlined ov-subform__chevron">expand_more</span>
+						</summary>
+						<form class="ov-subform__body" onsubmit="createRoom(event)">
 						<div class="ov-field">
-							<input type="text" id="room-name" class="ov-input" placeholder="Room name" required />
+							<label class="ov-label" for="room-name">Room name</label>
+							<input
+								type="text"
+								id="room-name"
+								class="ov-input"
+								placeholder="e.g. Example Room"
+								required
+							/>
 						</div>
 
 						<!-- Error message -->
@@ -99,6 +129,7 @@
 
 						<button type="submit" class="ov-btn ov-btn--primary ov-btn--block">Create Room</button>
 					</form>
+					</details>
 				</section>
 			</div>
 		</main>
@@ -110,6 +141,7 @@
 					<button class="ov-icon-btn" title="Back" onclick="backToHome()">
 						<span class="material-symbols-outlined">arrow_back</span>
 					</button>
+					<span class="material-symbols-outlined ov-icon--users">group</span>
 					<h2 id="members-room-name" class="ov-subscreen__title"></h2>
 					<button id="access-as-user-btn" class="ov-btn ov-btn--primary ov-btn--sm" onclick="accessAsUser()">
 						<span class="material-symbols-outlined">login</span>
@@ -120,23 +152,35 @@
 				<!-- Add member forms: a user (from the existing users) or an identified guest (by name) -->
 				<div id="add-member-forms" class="ov-forms">
 					<form class="ov-form-row" onsubmit="addUser(event)">
-						<select id="member-user" class="ov-select" required>
-							<!-- Users will be dynamically added here -->
-						</select>
-						<select id="member-user-role" class="ov-select">
-							<option value="speaker">Speaker</option>
-							<option value="moderator">Moderator</option>
-						</select>
-						<button type="submit" class="ov-btn ov-btn--primary">Add user</button>
+						<div class="ov-form-field">
+							<label class="ov-label" for="member-user">User</label>
+							<select id="member-user" class="ov-select" required>
+								<!-- Users will be dynamically added here -->
+							</select>
+						</div>
+						<div class="ov-form-field">
+							<label class="ov-label" for="member-user-role">Role</label>
+							<select id="member-user-role" class="ov-select">
+								<option value="speaker">Speaker</option>
+								<option value="moderator">Moderator</option>
+							</select>
+						</div>
+						<button type="submit" class="ov-btn ov-btn--users">Add user</button>
 					</form>
 
 					<form class="ov-form-row" onsubmit="addGuest(event)">
-						<input type="text" id="guest-name" class="ov-input" placeholder="Guest name (e.g. Charlie)" required />
-						<select id="guest-role" class="ov-select">
-							<option value="speaker">Speaker</option>
-							<option value="moderator">Moderator</option>
-						</select>
-						<button type="submit" class="ov-btn ov-btn--primary">Add guest</button>
+						<div class="ov-form-field">
+							<label class="ov-label" for="guest-name">Guest name</label>
+							<input type="text" id="guest-name" class="ov-input" placeholder="e.g. Charlie" required />
+						</div>
+						<div class="ov-form-field">
+							<label class="ov-label" for="guest-role">Role</label>
+							<select id="guest-role" class="ov-select">
+								<option value="speaker">Speaker</option>
+								<option value="moderator">Moderator</option>
+							</select>
+						</div>
+						<button type="submit" class="ov-btn ov-btn--users">Add guest</button>
 					</form>
 				</div>
 
@@ -154,9 +198,10 @@
 				</div>
 
 				<p class="ov-hint">
-					<strong>Users</strong> access the room by clicking <strong>Access as user</strong> and logging in with their OpenVidu
-					Meet credentials (their User ID and password). <strong>Identified guests</strong> access the room through their own
-					unique link (use the access button next to each guest), with no login required.
+					<strong>Users</strong> access the room by clicking <strong>Access as user</strong> and logging in
+					with their OpenVidu Meet credentials (their User ID and password).
+					<strong>Identified guests</strong> access the room through their own unique link (use the access
+					button next to each guest), with no login required.
 				</p>
 			</section>
 		</main>
@@ -164,8 +209,7 @@
 		<!-- ROOM VIEW -->
 		<main id="room" class="ov-room-view" hidden>
 			<div id="meet-container">
-				<!-- The OpenVidu Meet WebComponent will be inserted here when user accesses a room -->
-				<!-- <openvidu-meet room-url="..."></openvidu-meet>-->
+				<!-- The OpenVidu Meet WebComponent will be inserted here when an individual accesses a room -->
 			</div>
 		</main>
 

@@ -71,8 +71,8 @@ app.delete('/rooms/:roomId', async (req, res) => {
 
 // List all recordings
 app.get('/recordings', async (req, res) => {
-	// Create the base path for recordings, including maxItems parameter
-	let recordingsPath = `recordings?maxItems=100`;
+	// Create the base path for recordings: filter to completed recordings only, up to 100
+	let recordingsPath = `recordings?maxItems=100&status=complete`;
 
 	const { room: roomName } = req.query;
 	if (roomName) {

@@ -27,10 +27,12 @@
 	--ov-meet-color-error: #f44336;
 	--ov-meet-color-error-dark: #d32f2f;
 	--ov-meet-color-success: #4caf50;
+	--ov-meet-color-accent: #7b1fa2;
+	--ov-meet-color-accent-dark: #6a1b9a;
+	--ov-meet-color-users: #37b953;
+	--ov-meet-color-users-dark: #2e9d46;
 
-	/* Role / type / status accents */
-	--ov-meet-moderator-color: #0d9488;
-	--ov-meet-guest-color: #0277bd;
+	/* Status accent */
 	--ov-meet-warning-color: #e65100;
 
 	/* Surfaces */
@@ -137,6 +139,7 @@ body {
 /* === Page layout ========================================================== */
 .ov-page {
 	flex: 1;
+	min-height: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -173,12 +176,34 @@ body {
 }
 
 .ov-card__title {
+	display: flex;
+	align-items: center;
+	gap: var(--ov-meet-spacing-sm);
 	margin: 0 0 var(--ov-meet-spacing-md);
 	padding-bottom: var(--ov-meet-spacing-sm);
 	font-size: var(--ov-meet-font-size-xl);
 	font-weight: var(--ov-meet-font-weight-semibold);
 	color: var(--ov-meet-text-primary);
 	border-bottom: 2px solid var(--ov-meet-brand-green);
+}
+
+/* Colored concept icons used in titles (matches the OpenVidu Meet palette) */
+.ov-card__title .material-symbols-outlined,
+.ov-subscreen__title .material-symbols-outlined,
+.ov-subscreen__header > .material-symbols-outlined {
+	font-size: 22px;
+}
+
+.ov-icon--rooms {
+	color: var(--ov-meet-color-primary);
+}
+
+.ov-icon--users {
+	color: var(--ov-meet-color-users);
+}
+
+.ov-icon--recordings {
+	color: var(--ov-meet-color-accent);
 }
 
 .ov-card__body {
@@ -198,21 +223,111 @@ body {
 .ov-panel {
 	flex: 1;
 	min-height: 0;
+	max-height: 78vh;
 }
 
-/* Recessed form area nested inside a card */
+/* Recessed, collapsible form area (a <details>) nested inside a card, so it
+   does not crowd the list above it. */
 .ov-subform {
-	margin-top: var(--ov-meet-spacing-md);
-	padding: var(--ov-meet-spacing-md);
+	margin-top: var(--ov-meet-spacing-lg);
 	background: var(--ov-meet-background-secondary);
+	border: 1px solid var(--ov-meet-border-color-light);
 	border-radius: var(--ov-meet-radius-md);
+}
+
+/* <summary> acting as the form header / expand toggle */
+.ov-subform__title {
+	display: flex;
+	align-items: center;
+	gap: var(--ov-meet-spacing-xs);
+	margin: 0;
+	padding: var(--ov-meet-spacing-md);
+	font-size: var(--ov-meet-font-size-md);
+	font-weight: var(--ov-meet-font-weight-semibold);
+	color: var(--ov-meet-text-primary);
+	cursor: pointer;
+	list-style: none;
+	user-select: none;
+}
+
+.ov-subform__title::-webkit-details-marker {
+	display: none;
+}
+
+.ov-subform__title .material-symbols-outlined {
+	font-size: 20px;
+}
+
+.ov-subform__chevron {
+	margin-left: auto;
+	color: var(--ov-meet-text-secondary);
+	transition: transform var(--ov-meet-transition-fast);
+}
+
+.ov-subform[open] .ov-subform__chevron {
+	transform: rotate(180deg);
+}
+
+.ov-subform__body {
+	padding: 0 var(--ov-meet-spacing-md) var(--ov-meet-spacing-md);
+}
+
+/* User list item (avatar + name + @id) */
+.ov-user {
+	display: flex;
+	align-items: center;
+	gap: var(--ov-meet-spacing-md);
+	min-width: 0;
+}
+
+.ov-user__avatar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	flex-shrink: 0;
+	border-radius: var(--ov-meet-radius-circle);
+	background: rgba(55, 185, 83, 0.15);
+	color: var(--ov-meet-color-users-dark);
+	font-size: var(--ov-meet-font-size-sm);
+	font-weight: var(--ov-meet-font-weight-semibold);
+	text-transform: uppercase;
+}
+
+.ov-user__info {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.ov-user__name {
+	font-weight: var(--ov-meet-font-weight-medium);
+	color: var(--ov-meet-text-primary);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ov-user__id {
+	display: flex;
+	align-items: center;
+	gap: var(--ov-meet-spacing-xs);
+	font-size: var(--ov-meet-font-size-sm);
+	color: var(--ov-meet-text-secondary);
+}
+
+.ov-user__id .material-symbols-outlined {
+	font-size: 14px;
 }
 
 /* === Sub-screens (members, recordings) ==================================== */
 .ov-subscreen {
 	width: 100%;
 	max-width: 800px;
-	max-height: 85vh;
+	/* Fit within the viewport below the app bar (~70px) and the page's vertical
+	   padding, so only the card body scrolls — never the whole page. */
+	max-height: calc(100dvh - 70px - 2 * var(--ov-meet-spacing-xl));
 }
 
 .ov-subscreen--wide {
@@ -229,14 +344,15 @@ body {
 }
 
 .ov-subscreen__title {
+	display: flex;
+	align-items: center;
+	gap: var(--ov-meet-spacing-sm);
 	flex: 1;
+	min-width: 0;
 	margin: 0;
 	font-size: var(--ov-meet-font-size-xl);
 	font-weight: var(--ov-meet-font-weight-semibold);
 	color: var(--ov-meet-text-primary);
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
 }
 
 .ov-hint {
@@ -391,6 +507,7 @@ body {
 .ov-badge {
 	display: inline-flex;
 	align-items: center;
+	gap: var(--ov-meet-spacing-xs);
 	padding: 2px var(--ov-meet-spacing-sm);
 	font-size: var(--ov-meet-font-size-sm);
 	font-weight: var(--ov-meet-font-weight-medium);
@@ -400,24 +517,26 @@ body {
 	white-space: nowrap;
 }
 
+.ov-badge .material-symbols-outlined {
+	font-size: 14px;
+}
+
+/* Role badges: moderator = blue, speaker = green */
 .ov-badge--moderator {
-	color: var(--ov-meet-moderator-color);
-	background: rgba(13, 148, 136, 0.12);
-}
-
-.ov-badge--speaker {
-	color: var(--ov-meet-text-secondary);
-	background: var(--ov-meet-surface-variant);
-}
-
-.ov-badge--user {
 	color: var(--ov-meet-color-primary-dark);
 	background: rgba(25, 118, 210, 0.12);
 }
 
+.ov-badge--speaker {
+	color: var(--ov-meet-color-users-dark);
+	background: rgba(55, 185, 83, 0.16);
+}
+
+/* Type badges: user & guest = grey */
+.ov-badge--user,
 .ov-badge--guest {
-	color: var(--ov-meet-guest-color);
-	background: rgba(2, 119, 189, 0.12);
+	color: var(--ov-meet-color-secondary);
+	background: rgba(88, 88, 88, 0.12);
 }
 
 .ov-badge--active {
@@ -507,6 +626,28 @@ body {
 	box-shadow: var(--ov-meet-shadow-hover);
 }
 
+/* Green — users & members domain */
+.ov-btn--users {
+	background: var(--ov-meet-color-users);
+	color: var(--ov-meet-text-on-primary);
+}
+
+.ov-btn--users:hover {
+	background: var(--ov-meet-color-users-dark);
+	box-shadow: var(--ov-meet-shadow-hover);
+}
+
+/* Purple — recordings domain */
+.ov-btn--recordings {
+	background: var(--ov-meet-color-accent);
+	color: var(--ov-meet-text-on-primary);
+}
+
+.ov-btn--recordings:hover {
+	background: var(--ov-meet-color-accent-dark);
+	box-shadow: var(--ov-meet-shadow-hover);
+}
+
 /* === Icon buttons ========================================================= */
 .ov-icon-btn {
 	display: inline-flex;
@@ -586,24 +727,41 @@ body {
 	box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
 }
 
-/* Inline form row (input + select + submit) */
+/* All add-member forms share ONE grid so their fields and buttons line up in
+   the same columns across forms (each form contributes one row). */
 .ov-forms {
-	display: flex;
-	flex-direction: column;
+	display: grid;
+	grid-template-columns: 1fr 1fr auto;
 	gap: var(--ov-meet-spacing-sm);
+	align-items: end;
 	margin-bottom: var(--ov-meet-spacing-md);
 }
 
+/* Each form dissolves its box so its fields/button become items of .ov-forms */
 .ov-form-row {
-	display: flex;
-	gap: var(--ov-meet-spacing-sm);
-	align-items: center;
+	display: contents;
 }
 
-.ov-form-row .ov-input,
-.ov-form-row .ov-select {
-	flex: 1;
-	width: auto;
+.ov-form-row > .ov-input,
+.ov-form-row > .ov-select {
+	width: 100%;
+}
+
+/* Labeled field (label stacked above its control), one per grid column */
+.ov-form-field {
+	display: flex;
+	flex-direction: column;
+	gap: var(--ov-meet-spacing-xs);
+	min-width: 0;
+}
+
+.ov-form-field .ov-input,
+.ov-form-field .ov-select {
+	width: 100%;
+}
+
+.ov-form-field .ov-label {
+	margin-bottom: 0;
 }
 
 /* === Search / filter group ================================================ */
@@ -617,9 +775,14 @@ body {
 
 .ov-search {
 	display: flex;
+	width: min(320px, 100%);
+	margin-left: auto;
 }
 
 .ov-search .ov-input {
+	width: auto;
+	flex: 1;
+	min-width: 0;
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 }
@@ -702,7 +865,8 @@ body {
 
 	#rooms-container,
 	#create-room,
-	.ov-panel {
+	.ov-panel,
+	.ov-subscreen {
 		width: 100%;
 		max-height: none;
 	}
@@ -717,13 +881,7 @@ body {
 		flex-wrap: wrap;
 	}
 
-	.ov-form-row {
-		flex-direction: column;
-		align-items: stretch;
-	}
-
-	.ov-form-row .ov-input,
-	.ov-form-row .ov-select {
-		width: 100%;
+	.ov-forms {
+		grid-template-columns: 1fr;
 	}
 }

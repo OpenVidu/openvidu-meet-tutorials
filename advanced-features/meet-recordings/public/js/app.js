@@ -76,7 +76,7 @@ function getRoomListItemTemplate(room) {
                     Speaker
                 </button>
                 <button
-                    class="ov-btn ov-btn--secondary ov-btn--sm"
+                    class="ov-btn ov-btn--recordings ov-btn--sm"
                     onclick="listRecordingsByRoom('${room.roomName}');"
                 >
                     <span class="material-symbols-outlined">video_library</span>
@@ -110,8 +110,8 @@ async function createRoom(e) {
 			roomName
 		});
 
-		// Add new room to the list
-		rooms.set(room.roomId, room);
+		// Add the new room to the start (the API returns rooms newest first)
+		prependToMap(rooms, room.roomId, room);
 		renderRooms();
 
 		// Reset the form
@@ -221,6 +221,14 @@ async function listRecordingsByRoom(roomName) {
 	await listRecordings();
 }
 
+function backToHome() {
+	// Hide the recordings screen and show the home screen
+	const recordingsScreen = document.querySelector('#recordings');
+	recordingsScreen.hidden = true;
+	const homeScreen = document.querySelector('#home');
+	homeScreen.hidden = false;
+}
+
 async function listRecordings(e) {
 	if (e) {
 		// Prevent the default form submission
@@ -232,9 +240,7 @@ async function listRecordings(e) {
 	const recordingsUrl = '/recordings' + (roomName ? `?room=${roomName}` : '');
 
 	try {
-		let { recordings: recordingsList } = await httpRequest('GET', recordingsUrl);
-		// Filter completed recordings
-		recordingsList = filterCompletedRecordings(recordingsList);
+		const { recordings: recordingsList } = await httpRequest('GET', recordingsUrl);
 
 		// Clear the previous recordings and populate the new ones
 		recordings.clear();
@@ -250,10 +256,6 @@ async function listRecordings(e) {
 		recordingsErrorElement.textContent = 'Error loading recordings';
 		recordingsErrorElement.hidden = false;
 	}
-}
-
-function filterCompletedRecordings(recordingList) {
-	return recordingList.filter((recording) => recording.status === 'complete');
 }
 
 function renderRecordings() {
@@ -272,22 +274,10 @@ function renderRecordings() {
 		noRecordingsElement.hidden = true;
 	}
 
-	// Sort recordings by start date in ascending order
-	const recordingsArray = Array.from(recordings.values());
-	const sortedRecordings = sortRecordingsByDate(recordingsArray);
-
 	// Add recordings to the list element
-	sortedRecordings.forEach((recording) => {
+	Array.from(recordings.values()).forEach((recording) => {
 		const recordingItem = getRecordingListItemTemplate(recording);
 		recordingsList.innerHTML += recordingItem;
-	});
-}
-
-function sortRecordingsByDate(recordings) {
-	return recordings.sort((a, b) => {
-		const dateA = new Date(a.startDate || -1);
-		const dateB = new Date(b.startDate || -1);
-		return dateA.getTime() - dateB.getTime();
 	});
 }
 
@@ -340,10 +330,9 @@ async function displayRecording(recordingId) {
 	// Add event listener for when the OpenVidu Meet component is closed
 	const meet = document.querySelector('openvidu-meet');
 	meet.once('closed', () => {
-		// Hide the display recording screen and show the home screen
+		// Hide the display recording screen and show the recordings screen
 		displayRecordingScreen.hidden = true;
-		const homeScreen = document.querySelector('#home');
-		homeScreen.hidden = false;
+		recordingsScreen.hidden = false;
 	});
 }
 
@@ -367,6 +356,14 @@ async function deleteRecording(recordingId) {
 	} catch (error) {
 		console.error('Error deleting recording:', error.message);
 	}
+}
+
+// Adds an entry to the start of a Map so newly created items appear first,
+// matching the OpenVidu Meet API order (items are returned newest first)
+function prependToMap(map, key, value) {
+	const entries = [[key, value], ...map];
+	map.clear();
+	entries.forEach(([k, v]) => map.set(k, v));
 }
 
 // Function to make HTTP requests to the backend

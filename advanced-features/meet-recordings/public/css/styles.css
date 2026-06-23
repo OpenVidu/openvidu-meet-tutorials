@@ -824,6 +824,49 @@ body {
 	padding: var(--ov-meet-spacing-sm) var(--ov-meet-spacing-lg);
 	background: var(--ov-meet-surface-elevated);
 	border-bottom: 1px solid var(--ov-meet-border-color-light);
+	box-shadow: var(--ov-meet-shadow-sm);
+}
+
+/* Left side of the header: logo + divider + live dot + room name + role badge */
+.ov-room-header__info {
+	display: flex;
+	align-items: center;
+	gap: var(--ov-meet-spacing-sm);
+	min-width: 0;
+}
+
+.ov-room-header__logo {
+	height: 30px;
+	width: auto;
+	display: block;
+}
+
+.ov-room-header__divider {
+	width: 1px;
+	height: 22px;
+	background: var(--ov-meet-border-color);
+}
+
+/* Small pulsing dot signalling the meeting is live */
+.ov-live-dot {
+	width: 8px;
+	height: 8px;
+	flex-shrink: 0;
+	border-radius: var(--ov-meet-radius-circle);
+	background: var(--ov-meet-color-success);
+	animation: ov-pulse 2s infinite;
+}
+
+@keyframes ov-pulse {
+	0% {
+		box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.5);
+	}
+	70% {
+		box-shadow: 0 0 0 6px rgba(76, 175, 80, 0);
+	}
+	100% {
+		box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+	}
 }
 
 .ov-room-header__name {

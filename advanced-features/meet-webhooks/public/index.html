@@ -73,7 +73,13 @@
 		<main id="room" class="ov-room-view" hidden>
 			<!-- Header section with room name and end meeting button (only visible for moderators) -->
 			<div id="room-header" class="ov-room-header" hidden>
-				<span id="room-name-header" class="ov-room-header__name"></span>
+				<div class="ov-room-header__info">
+					<img class="ov-room-header__logo" src="images/meet_logo.png" alt="OpenVidu Meet" />
+					<span class="ov-room-header__divider"></span>
+					<span class="ov-live-dot" aria-hidden="true"></span>
+					<span id="room-name-header" class="ov-room-header__name"></span>
+					<span id="room-role-badge" class="ov-badge"></span>
+				</div>
 				<button id="end-meeting-btn" class="ov-btn ov-btn--danger ov-btn--sm" hidden>
 					<span class="material-symbols-outlined">call_end</span>
 					End meeting

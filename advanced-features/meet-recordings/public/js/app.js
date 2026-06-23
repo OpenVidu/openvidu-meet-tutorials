@@ -169,24 +169,18 @@ function accessRoom(roomName, roomUrl, role) {
 
 		// Show the room header with the room name
 		roomHeader.hidden = false;
-		const roomNameHeader = document.querySelector('#room-name-header');
-		roomNameHeader.textContent = roomName;
+		document.querySelector('#room-name-header').textContent = roomName;
 
-		// Show end meeting button only for moderators
+		// Show the participant's role as a badge
+		const roleBadge = document.querySelector('#room-role-badge');
+		const roleIcon = role === 'moderator' ? 'shield_person' : 'record_voice_over';
+		roleBadge.className = `ov-badge ov-badge--${role === 'moderator' ? 'moderator' : 'speaker'}`;
+		roleBadge.innerHTML = `<span class="material-symbols-outlined">${roleIcon}</span>${role}`;
+
+		// The "End meeting" command is available only to moderators
 		const endMeetingButton = document.querySelector('#end-meeting-btn');
-		if (role === 'moderator') {
-			endMeetingButton.hidden = false;
-		} else {
-			endMeetingButton.hidden = true;
-		}
-
-		// Event listener for ending the meeting
-		if (role === 'moderator') {
-			endMeetingButton.addEventListener('click', () => {
-				console.log('Ending meeting');
-				meet.endMeeting();
-			});
-		}
+		endMeetingButton.hidden = role !== 'moderator';
+		endMeetingButton.onclick = role === 'moderator' ? () => meet.endMeeting() : null;
 	});
 
 	// Event listener for when the local participant leaves the room

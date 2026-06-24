@@ -15,7 +15,7 @@ This is a more advanced example of how to integrate OpenVidu Meet into a Node.js
 
 ```bash
 git clone https://github.com/OpenVidu/openvidu-meet-tutorials.git
-cd openvidu-meet-tutorials/integration/meet-webcomponent-commands-events
+cd openvidu-meet-tutorials/embedding-options/meet-webcomponent-commands-events
 ```
 
 2. Install dependencies

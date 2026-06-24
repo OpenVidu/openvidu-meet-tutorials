@@ -1,6 +1,6 @@
-# OpenVidu Meet WebComponent Basic Example
+# OpenVidu Meet Direct Link
 
-This is a basic example of how to integrate OpenVidu Meet into a Node.js application using its WebComponent. It is built using Node.js and Express for the backend and plain HTML/CSS/JavaScript for the frontend.
+This is a simple example of how to use OpenVidu Meet in a Node.js application by creating a direct link to a meeting room. It is built using Node.js and Express for the backend and plain HTML/CSS/JavaScript for the frontend.
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ This is a basic example of how to integrate OpenVidu Meet into a Node.js applica
 
 ```bash
 git clone https://github.com/OpenVidu/openvidu-meet-tutorials.git
-cd openvidu-meet-tutorials/integration/meet-webcomponent-basic
+cd openvidu-meet-tutorials/embedding-options/meet-direct-link
 ```
 
 2. Install dependencies

@@ -4,10 +4,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 	await fetchRooms();
 });
 
+// --- ROOMS ---
+
 async function fetchRooms() {
 	try {
 		const { rooms: roomsList } = await httpRequest('GET', '/rooms');
 
+		rooms.clear();
 		roomsList.forEach((room) => {
 			rooms.set(room.roomId, room);
 		});
@@ -39,10 +42,9 @@ function renderRooms() {
 	}
 
 	// Add rooms to the list element
-	Array.from(rooms.values()).forEach((room) => {
-		const roomItem = getRoomListItemTemplate(room);
-		roomsList.innerHTML += roomItem;
-	});
+	roomsList.innerHTML = Array.from(rooms.values())
+		.map((room) => getRoomListItemTemplate(room))
+		.join('');
 }
 
 function getRoomListItemTemplate(room) {
@@ -51,6 +53,7 @@ function getRoomListItemTemplate(room) {
             <span class="ov-list-item__name">${room.roomName}</span>
             <div class="ov-list-item__actions">
                 <button
+                    type="button"
                     title="Access as moderator"
                     class="ov-btn ov-btn--primary ov-btn--sm"
                     onclick="accessRoom(
@@ -63,6 +66,7 @@ function getRoomListItemTemplate(room) {
                     Moderator
                 </button>
                 <button
+                    type="button"
                     title="Access as speaker"
                     class="ov-btn ov-btn--secondary ov-btn--sm"
                     onclick="accessRoom(
@@ -75,6 +79,7 @@ function getRoomListItemTemplate(room) {
                     Speaker
                 </button>
                 <button
+                    type="button"
                     title="Delete room"
                     class="ov-icon-btn ov-icon-btn--danger"
                     onclick="deleteRoom('${room.roomId}');"
@@ -97,7 +102,6 @@ async function createRoom(e) {
 
 	try {
 		const roomName = document.querySelector('#room-name').value;
-
 		const { room } = await httpRequest('POST', '/rooms', {
 			roomName
 		});
@@ -107,13 +111,12 @@ async function createRoom(e) {
 		renderRooms();
 
 		// Reset the form
-		const createRoomForm = document.querySelector('#create-room form');
-		createRoomForm.reset();
+		e.target.reset();
 	} catch (error) {
 		console.error('Error creating room:', error.message);
 
 		// Show error message
-		errorDiv.textContent = 'Error creating room';
+		errorDiv.textContent = error.message || 'Error creating room';
 		errorDiv.hidden = false;
 	}
 }
@@ -130,6 +133,10 @@ async function deleteRoom(roomId) {
 	}
 }
 
+// --- ACCESS ---
+
+// Embed the OpenVidu Meet component and react to its events. 'roomName' and 'role' fill the
+// custom room header shown once the local participant joins the meeting.
 function accessRoom(roomName, roomUrl, role) {
 	console.log(`Accessing room as ${role}`);
 
@@ -161,7 +168,8 @@ function accessRoom(roomName, roomUrl, role) {
 
 		// Show the room header with the room name
 		roomHeader.hidden = false;
-		document.querySelector('#room-name-header').textContent = roomName;
+		const roomNameHeader = document.querySelector('#room-name-header');
+		roomNameHeader.textContent = roomName;
 
 		// Show the participant's role as a badge
 		const roleBadge = document.querySelector('#room-role-badge');

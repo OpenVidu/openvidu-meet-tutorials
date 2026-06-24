@@ -1,4 +1,3 @@
-import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -16,7 +15,6 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -85,9 +83,7 @@ app.post('/rooms/:roomId/members', async (req, res) => {
 
 	try {
 		// Add an identified guest to the room.
-		// Providing 'name' (and no 'userId') creates a member of type 'identified_guest':
-		// the API generates a unique 'memberId' (guest-XXXX) and a unique 'accessUrl'
-		// that grants access to the room without any authentication.
+		// Providing 'name' (and no 'userId') creates a member of type 'identified_guest'
 		const member = await httpRequest('POST', `rooms/${roomId}/members`, {
 			name,
 			baseRole

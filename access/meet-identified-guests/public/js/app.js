@@ -46,10 +46,9 @@ function renderRooms() {
 	}
 
 	// Add rooms to the list element
-	Array.from(rooms.values()).forEach((room) => {
-		const roomItem = getRoomListItemTemplate(room);
-		roomsList.innerHTML += roomItem;
-	});
+	roomsList.innerHTML = Array.from(rooms.values())
+		.map((room) => getRoomListItemTemplate(room))
+		.join('');
 }
 
 function getRoomListItemTemplate(room) {
@@ -58,6 +57,7 @@ function getRoomListItemTemplate(room) {
             <span class="ov-list-item__name">${room.roomName}</span>
             <div class="ov-list-item__actions">
                 <button
+                    type="button"
                     title="Access as moderator"
                     class="ov-btn ov-btn--primary ov-btn--sm"
                     onclick="accessRoom('${room.access.anonymous.moderator.url}', '#home');"
@@ -66,6 +66,7 @@ function getRoomListItemTemplate(room) {
                     Moderator
                 </button>
                 <button
+                    type="button"
                     title="Access as speaker"
                     class="ov-btn ov-btn--secondary ov-btn--sm"
                     onclick="accessRoom('${room.access.anonymous.speaker.url}', '#home');"
@@ -74,6 +75,7 @@ function getRoomListItemTemplate(room) {
                     Speaker
                 </button>
                 <button
+                    type="button"
                     class="ov-btn ov-btn--users ov-btn--sm"
                     onclick="manageMembers('${room.roomId}');"
                 >
@@ -81,6 +83,7 @@ function getRoomListItemTemplate(room) {
                     Members
                 </button>
                 <button
+                    type="button"
                     title="Delete room"
                     class="ov-icon-btn ov-icon-btn--danger"
                     onclick="deleteRoom('${room.roomId}');"
@@ -143,19 +146,24 @@ async function manageMembers(roomId) {
 	}
 
 	// Hide the home screen and show the members screen
-	document.querySelector('#home').hidden = true;
-	document.querySelector('#members').hidden = false;
+	const homeScreen = document.querySelector('#home');
+	homeScreen.hidden = true;
+	const membersScreen = document.querySelector('#members');
+	membersScreen.hidden = false;
 
 	// Set the room name in the header
-	document.querySelector('#members-room-name').textContent = currentRoom.roomName;
+	const membersRoomName = document.querySelector('#members-room-name');
+	membersRoomName.textContent = currentRoom.roomName;
 
 	await fetchMembers();
 }
 
 function backToHome() {
 	currentRoom = null;
-	document.querySelector('#members').hidden = true;
-	document.querySelector('#home').hidden = false;
+	const membersScreen = document.querySelector('#members');
+	membersScreen.hidden = true;
+	const homeScreen = document.querySelector('#home');
+	homeScreen.hidden = false;
 }
 
 async function fetchMembers() {
@@ -194,10 +202,9 @@ function renderMembers() {
 	}
 
 	// Add members to the list element
-	Array.from(members.values()).forEach((member) => {
-		const memberItem = getMemberListItemTemplate(member);
-		membersList.innerHTML += memberItem;
-	});
+	membersList.innerHTML = Array.from(members.values())
+		.map((member) => getMemberListItemTemplate(member))
+		.join('');
 }
 
 function getMemberListItemTemplate(member) {
@@ -217,6 +224,7 @@ function getMemberListItemTemplate(member) {
             </div>
             <div class="ov-member__actions">
                 <button
+					type="button"
 					title="Copy access link"
 					class="ov-icon-btn"
 					onclick="copyAccessUrl('${member.memberId}', this)"
@@ -224,6 +232,7 @@ function getMemberListItemTemplate(member) {
                     <span class="material-symbols-outlined">content_copy</span>
                 </button>
                 <button
+					type="button"
 					title="Access as ${member.name}"
 					class="ov-icon-btn"
 					onclick="accessRoom('${member.accessUrl}', '#members')"
@@ -231,6 +240,7 @@ function getMemberListItemTemplate(member) {
                     <span class="material-symbols-outlined">login</span>
                 </button>
                 <button
+					type="button"
 					title="Remove member"
 					class="ov-icon-btn ov-icon-btn--danger"
 					onclick="removeMember('${member.memberId}')"
@@ -315,8 +325,10 @@ async function copyAccessUrl(memberId, button) {
 // (the home screen for anonymous access, the members screen for an identified guest).
 function accessRoom(roomUrl, returnViewId) {
 	// Hide the home and members screens and show the room screen
-	document.querySelector('#home').hidden = true;
-	document.querySelector('#members').hidden = true;
+	const homeScreen = document.querySelector('#home');
+	homeScreen.hidden = true;
+	const membersScreen = document.querySelector('#members');
+	membersScreen.hidden = true;
 	const roomScreen = document.querySelector('#room');
 	roomScreen.hidden = false;
 
@@ -337,7 +349,8 @@ function accessRoom(roomUrl, returnViewId) {
 		// Clear the component and go back to the view we came from
 		meetContainer.innerHTML = '';
 		roomScreen.hidden = true;
-		document.querySelector(returnViewId).hidden = false;
+		const returnView = document.querySelector(returnViewId);
+		returnView.hidden = false;
 	});
 }
 

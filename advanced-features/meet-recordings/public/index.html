@@ -80,7 +80,7 @@
 					<span id="room-name-header" class="ov-room-header__name"></span>
 					<span id="room-role-badge" class="ov-badge"></span>
 				</div>
-				<button id="end-meeting-btn" class="ov-btn ov-btn--danger ov-btn--sm" hidden>
+				<button id="end-meeting-btn" type="button" class="ov-btn ov-btn--danger ov-btn--sm" hidden>
 					<span class="material-symbols-outlined">call_end</span>
 					End meeting
 				</button>
@@ -95,13 +95,19 @@
 		<main id="recordings" class="ov-page" hidden>
 			<section class="ov-card ov-subscreen ov-subscreen--wide">
 				<header class="ov-subscreen__header">
-					<button class="ov-icon-btn" title="Back" onclick="backToHome()">
+					<button type="button" class="ov-icon-btn" title="Back" onclick="backToHome()">
 						<span class="material-symbols-outlined">arrow_back</span>
 					</button>
 					<h2 class="ov-subscreen__title">
 						<span class="material-symbols-outlined ov-icon--recordings">video_library</span>Recordings
 					</h2>
-					<button id="refresh-recordings" class="ov-icon-btn" title="Refresh" onclick="listRecordings()">
+					<button
+						id="refresh-recordings"
+						type="button"
+						class="ov-icon-btn"
+						title="Refresh"
+						onclick="listRecordings()"
+					>
 						<span class="material-symbols-outlined">refresh</span>
 					</button>
 				</header>

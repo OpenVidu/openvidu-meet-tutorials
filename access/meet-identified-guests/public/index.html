@@ -27,7 +27,9 @@
 			<div class="ov-panels">
 				<!-- Rooms list section -->
 				<section id="rooms-container" class="ov-card">
-					<h2 class="ov-card__title"><span class="material-symbols-outlined ov-icon--rooms">video_chat</span>Rooms</h2>
+					<h2 class="ov-card__title">
+						<span class="material-symbols-outlined ov-icon--rooms">video_chat</span>Rooms
+					</h2>
 
 					<div id="rooms-list" class="ov-card__body">
 						<!-- Message when there are no rooms or an error occurs while loading -->
@@ -41,7 +43,9 @@
 
 				<!-- Create room section -->
 				<section id="create-room" class="ov-card">
-					<h2 class="ov-card__title"><span class="material-symbols-outlined ov-icon--rooms">add</span>Create a new room</h2>
+					<h2 class="ov-card__title">
+						<span class="material-symbols-outlined ov-icon--rooms">add</span>Create a new room
+					</h2>
 
 					<form onsubmit="createRoom(event)">
 						<div class="ov-field">
@@ -69,7 +73,7 @@
 		<main id="members" class="ov-page" hidden>
 			<section class="ov-card ov-subscreen">
 				<header id="members-header" class="ov-subscreen__header">
-					<button class="ov-icon-btn" title="Back" onclick="backToHome()">
+					<button type="button" class="ov-icon-btn" title="Back" onclick="backToHome()">
 						<span class="material-symbols-outlined">arrow_back</span>
 					</button>
 					<span class="material-symbols-outlined ov-icon--users">group</span>
@@ -80,11 +84,11 @@
 				<div id="add-member-forms" class="ov-forms">
 					<form class="ov-form-row" onsubmit="addGuest(event)">
 						<div class="ov-form-field">
-							<label class="ov-label" for="guest-name">Guest name</label>
+							<label for="guest-name" class="ov-label">Guest name</label>
 							<input type="text" id="guest-name" class="ov-input" placeholder="e.g. Charlie" required />
 						</div>
 						<div class="ov-form-field">
-							<label class="ov-label" for="guest-role">Role</label>
+							<label for="guest-role" class="ov-label">Role</label>
 							<select id="guest-role" class="ov-select">
 								<option value="speaker">Speaker</option>
 								<option value="moderator">Moderator</option>

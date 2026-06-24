@@ -1,4 +1,3 @@
-import bodyParser from 'body-parser';
 import cors from 'cors';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
@@ -13,13 +12,12 @@ dotenv.config();
 const SERVER_PORT = process.env.SERVER_PORT || 6080;
 const OV_MEET_SERVER_URL = process.env.OV_MEET_SERVER_URL || 'http://localhost:9080/meet';
 const OV_MEET_API_KEY = process.env.OV_MEET_API_KEY || 'meet-api-key';
-const MAX_WEBHOOK_AGE = 120 * 1000; // 2 minutes in milliseconds
+const MAX_WEBHOOK_AGE = 120 * 1000; // Reject webhook events older than 2 minutes (replay-attack protection)
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,6 +25,8 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // Create SSE instance for real-time notifications
 const sse = new SSE();
+
+// --- ROOMS ---
 
 // Create a new room
 app.post('/rooms', async (req, res) => {
@@ -75,9 +75,12 @@ app.delete('/rooms/:roomId', async (req, res) => {
 	}
 });
 
+// --- RECORDINGS ---
+
 // List all recordings
 app.get('/recordings', async (req, res) => {
-	// Create the base path for recordings: filter to completed recordings only, up to 100
+	// Create the base path for recordings: list up to 100 recordings, filtered to completed ones only.
+	// We use 'status=complete' because in-progress recordings cannot be played or downloaded yet.
 	let recordingsPath = `recordings?maxItems=100&status=complete`;
 
 	const { room: roomName } = req.query;
@@ -119,6 +122,8 @@ app.get('/recordings/:recordingId/url', async (req, res) => {
 		handleApiError(res, error, `Error fetching URL for recording '${recordingId}'`);
 	}
 });
+
+// --- WEBHOOK EVENTS ---
 
 // SSE endpoint for real-time notifications
 app.get('/events', sse.init);
@@ -178,24 +183,31 @@ const handleApiError = (res, error, message) => {
 	res.status(statusCode).json({ message: errorMessage });
 };
 
-// Helper function to validate webhook event signature
+// Helper function to validate the signature of a webhook event.
+// OpenVidu Meet signs every webhook so the receiver can verify it is genuine and was not tampered with.
+// Each request carries two headers: 'x-signature' (the signature) and 'x-timestamp' (when it was sent).
 const isWebhookEventValid = (body, headers) => {
 	const signature = headers['x-signature'];
 	const timestamp = parseInt(headers['x-timestamp'], 10);
 
+	// Reject the event if either security header is missing or invalid
 	if (!signature || !timestamp || isNaN(timestamp)) {
 		return false;
 	}
 
+	// Reject events older than MAX_WEBHOOK_AGE to prevent replay attacks
+	// (an attacker resending a request that was valid in the past)
 	const current = Date.now();
 	const diffTime = current - timestamp;
 	if (diffTime >= MAX_WEBHOOK_AGE) {
-		// Webhook event too old
 		return false;
 	}
 
+	// Recreate the signature locally: HMAC-SHA256 of "<timestamp>.<body>" using the API key as the secret.
+	// If our result matches the received signature, the event really came from OpenVidu Meet.
 	const signedPayload = `${timestamp}.${JSON.stringify(body)}`;
 	const expectedSignature = crypto.createHmac('sha256', OV_MEET_API_KEY).update(signedPayload, 'utf8').digest('hex');
 
+	// Compare with timingSafeEqual (not ===) so the comparison takes constant time and does not leak the expected value
 	return crypto.timingSafeEqual(Buffer.from(expectedSignature, 'hex'), Buffer.from(signature, 'hex'));
 };

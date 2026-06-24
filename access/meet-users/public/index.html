@@ -47,47 +47,47 @@
 							<span class="material-symbols-outlined ov-subform__chevron">expand_more</span>
 						</summary>
 						<form class="ov-subform__body" onsubmit="createUser(event)">
-						<div class="ov-field">
-							<label class="ov-label" for="user-id">User ID</label>
-							<input
-								type="text"
-								id="user-id"
-								class="ov-input"
-								placeholder="e.g. alice"
-								minlength="5"
-								maxlength="20"
-								pattern="[a-z0-9_]+"
-								title="5-20 characters: lowercase letters, numbers and underscores only"
-								required
-							/>
-						</div>
-						<div class="ov-field">
-							<label class="ov-label" for="user-name">Name</label>
-							<input
-								type="text"
-								id="user-name"
-								class="ov-input"
-								placeholder="e.g. Alice Smith"
-								required
-							/>
-						</div>
-						<div class="ov-field">
-							<label class="ov-label" for="user-password">Password</label>
-							<input
-								type="password"
-								id="user-password"
-								class="ov-input"
-								placeholder="Min 5 characters"
-								minlength="5"
-								required
-							/>
-						</div>
+							<div class="ov-field">
+								<label for="user-id" class="ov-label">User ID</label>
+								<input
+									type="text"
+									id="user-id"
+									class="ov-input"
+									placeholder="e.g. alice"
+									minlength="5"
+									maxlength="20"
+									pattern="[a-z0-9_]+"
+									title="5-20 characters: lowercase letters, numbers and underscores only"
+									required
+								/>
+							</div>
+							<div class="ov-field">
+								<label for="user-name" class="ov-label">Name</label>
+								<input
+									type="text"
+									id="user-name"
+									class="ov-input"
+									placeholder="e.g. Alice Smith"
+									required
+								/>
+							</div>
+							<div class="ov-field">
+								<label for="user-password" class="ov-label">Password</label>
+								<input
+									type="password"
+									id="user-password"
+									class="ov-input"
+									placeholder="Min 5 characters"
+									minlength="5"
+									required
+								/>
+							</div>
 
-						<!-- Error message -->
-						<div id="create-user-error" class="ov-alert ov-alert--error" hidden></div>
+							<!-- Error message -->
+							<div id="create-user-error" class="ov-alert ov-alert--error" hidden></div>
 
-						<button type="submit" class="ov-btn ov-btn--users ov-btn--block">Create User</button>
-					</form>
+							<button type="submit" class="ov-btn ov-btn--users ov-btn--block">Create User</button>
+						</form>
 					</details>
 				</section>
 
@@ -113,22 +113,22 @@
 							<span class="material-symbols-outlined ov-subform__chevron">expand_more</span>
 						</summary>
 						<form class="ov-subform__body" onsubmit="createRoom(event)">
-						<div class="ov-field">
-							<label class="ov-label" for="room-name">Room name</label>
-							<input
-								type="text"
-								id="room-name"
-								class="ov-input"
-								placeholder="e.g. Example Room"
-								required
-							/>
-						</div>
+							<div class="ov-field">
+								<label for="room-name" class="ov-label">Room name</label>
+								<input
+									type="text"
+									id="room-name"
+									class="ov-input"
+									placeholder="e.g. Example Room"
+									required
+								/>
+							</div>
 
-						<!-- Error message -->
-						<div id="create-room-error" class="ov-alert ov-alert--error" hidden></div>
+							<!-- Error message -->
+							<div id="create-room-error" class="ov-alert ov-alert--error" hidden></div>
 
-						<button type="submit" class="ov-btn ov-btn--primary ov-btn--block">Create Room</button>
-					</form>
+							<button type="submit" class="ov-btn ov-btn--primary ov-btn--block">Create Room</button>
+						</form>
 					</details>
 				</section>
 			</div>
@@ -138,12 +138,17 @@
 		<main id="members" class="ov-page" hidden>
 			<section class="ov-card ov-subscreen">
 				<header id="members-header" class="ov-subscreen__header">
-					<button class="ov-icon-btn" title="Back" onclick="backToHome()">
+					<button type="button" class="ov-icon-btn" title="Back" onclick="backToHome()">
 						<span class="material-symbols-outlined">arrow_back</span>
 					</button>
 					<span class="material-symbols-outlined ov-icon--users">group</span>
 					<h2 id="members-room-name" class="ov-subscreen__title"></h2>
-					<button id="access-as-user-btn" class="ov-btn ov-btn--primary ov-btn--sm" onclick="accessAsUser()">
+					<button
+						id="access-as-user-btn"
+						type="button"
+						class="ov-btn ov-btn--primary ov-btn--sm"
+						onclick="accessAsUser()"
+					>
 						<span class="material-symbols-outlined">login</span>
 						Access as user
 					</button>
@@ -153,13 +158,13 @@
 				<div id="add-member-forms" class="ov-forms">
 					<form class="ov-form-row" onsubmit="addUser(event)">
 						<div class="ov-form-field">
-							<label class="ov-label" for="member-user">User</label>
+							<label for="member-user" class="ov-label">User</label>
 							<select id="member-user" class="ov-select" required>
 								<!-- Users will be dynamically added here -->
 							</select>
 						</div>
 						<div class="ov-form-field">
-							<label class="ov-label" for="member-user-role">Role</label>
+							<label for="member-user-role" class="ov-label">Role</label>
 							<select id="member-user-role" class="ov-select">
 								<option value="speaker">Speaker</option>
 								<option value="moderator">Moderator</option>
@@ -170,11 +175,11 @@
 
 					<form class="ov-form-row" onsubmit="addGuest(event)">
 						<div class="ov-form-field">
-							<label class="ov-label" for="guest-name">Guest name</label>
+							<label for="guest-name" class="ov-label">Guest name</label>
 							<input type="text" id="guest-name" class="ov-input" placeholder="e.g. Charlie" required />
 						</div>
 						<div class="ov-form-field">
-							<label class="ov-label" for="guest-role">Role</label>
+							<label for="guest-role" class="ov-label">Role</label>
 							<select id="guest-role" class="ov-select">
 								<option value="speaker">Speaker</option>
 								<option value="moderator">Moderator</option>

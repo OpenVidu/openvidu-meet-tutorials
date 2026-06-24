@@ -1,4 +1,3 @@
-import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -16,11 +15,12 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, '../public')));
+
+// --- ROOMS ---
 
 // Create a new room
 app.post('/rooms', async (req, res) => {
@@ -69,9 +69,12 @@ app.delete('/rooms/:roomId', async (req, res) => {
 	}
 });
 
+// --- RECORDINGS ---
+
 // List all recordings
 app.get('/recordings', async (req, res) => {
-	// Create the base path for recordings: filter to completed recordings only, up to 100
+	// Create the base path for recordings: list up to 100 recordings, filtered to completed ones only.
+	// We use 'status=complete' because in-progress recordings cannot be played or downloaded yet.
 	let recordingsPath = `recordings?maxItems=100&status=complete`;
 
 	const { room: roomName } = req.query;

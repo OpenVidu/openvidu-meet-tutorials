@@ -4,10 +4,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 	await fetchRooms();
 });
 
+// --- ROOMS ---
+
 async function fetchRooms() {
 	try {
 		const { rooms: roomsList } = await httpRequest('GET', '/rooms');
 
+		rooms.clear();
 		roomsList.forEach((room) => {
 			rooms.set(room.roomId, room);
 		});
@@ -39,10 +42,9 @@ function renderRooms() {
 	}
 
 	// Add rooms to the list element
-	Array.from(rooms.values()).forEach((room) => {
-		const roomItem = getRoomListItemTemplate(room);
-		roomsList.innerHTML += roomItem;
-	});
+	roomsList.innerHTML = Array.from(rooms.values())
+		.map((room) => getRoomListItemTemplate(room))
+		.join('');
 }
 
 function getRoomListItemTemplate(room) {
@@ -67,6 +69,7 @@ function getRoomListItemTemplate(room) {
                     Speaker
                 </a>
                 <button
+                    type="button"
                     title="Delete room"
                     class="ov-icon-btn ov-icon-btn--danger"
                     onclick="deleteRoom('${room.roomId}');"
@@ -98,13 +101,12 @@ async function createRoom(e) {
 		renderRooms();
 
 		// Reset the form
-		const createRoomForm = document.querySelector('#create-room form');
-		createRoomForm.reset();
+		e.target.reset();
 	} catch (error) {
 		console.error('Error creating room:', error.message);
 
 		// Show error message
-		errorDiv.textContent = 'Error creating room';
+		errorDiv.textContent = error.message || 'Error creating room';
 		errorDiv.hidden = false;
 	}
 }

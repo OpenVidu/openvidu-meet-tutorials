@@ -1,4 +1,3 @@
-import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -16,7 +15,6 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -68,6 +66,7 @@ app.delete('/users/:userId', async (req, res) => {
 	const { userId } = req.params;
 
 	try {
+		// Delete the OpenVidu Meet user using the API.
 		await httpRequest('DELETE', `users/${userId}`);
 		res.status(200).json({ message: `User '${userId}' deleted successfully` });
 	} catch (error) {
@@ -157,8 +156,7 @@ app.get('/rooms/:roomId/members', async (req, res) => {
 	const { roomId } = req.params;
 
 	try {
-		// List all the members of the room using the API (100 max).
-		// We do not filter by type, so both users and identified guests are returned.
+		// List all the members of the room using the API (100 max)
 		const { members } = await httpRequest('GET', `rooms/${roomId}/members?maxItems=100`);
 		res.status(200).json({ members });
 	} catch (error) {

@@ -1,6 +1,6 @@
 # OpenVidu Meet Recordings
 
-This is a more advanced example of how to integrate OpenVidu Meet into a Node.js application and self-manage recordings. It is built using Node.js and Express for the backend and plain HTML/CSS/JavaScript for the frontend.
+This is a more advanced example of how to embed OpenVidu Meet into a Node.js application and self-manage recordings. It is built using Node.js and Express for the backend and plain HTML/CSS/JavaScript for the frontend.
 
 ## Prerequisites
 

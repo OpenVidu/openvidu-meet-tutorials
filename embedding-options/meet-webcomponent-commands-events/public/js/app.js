@@ -195,7 +195,8 @@ function accessRoom(roomName, roomUrl, role) {
 	meet.once('closed', () => {
 		console.log('OpenVidu Meet component closed');
 
-		// Hide the room screen and show the home screen
+		// Clear the OpenVidu Meet component and go back to the home screen
+		meetContainer.innerHTML = '';
 		roomScreen.hidden = true;
 		homeScreen.hidden = false;
 	});

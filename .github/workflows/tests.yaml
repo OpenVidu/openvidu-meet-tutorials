@@ -1,0 +1,101 @@
+name: Tutorial tests
+
+# That action's own readiness wait wraps the wider OpenVidu stack (its `ready-check` container does not
+# depend on openvidu-meet — see its docker-compose.yaml), so "Wait for the Meet server" below additionally
+# polls the Meet API itself before the suite runs.
+#
+# Repository configuration (all optional):
+#   vars.MEET_RUNNER      Runner label to use (default: ubuntu-latest). Must have Docker.
+#   secrets.MEET_API_KEY  API key, matching the deployment's MEET_INITIAL_API_KEY
+#                         (default: meet-api-key, the deployment's own default too).
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+    schedule:
+        # 02:00 UTC every night — the fullest run, recordings included (see MEET_E2E_RECORDINGS below).
+        - cron: '0 2 * * *'
+    workflow_dispatch:
+        inputs:
+            run_recordings:
+                description: 'Also run the recording capture test (needs a working egress)'
+                type: boolean
+                required: false
+                default: false
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    tests:
+        name: End-to-end tests
+        runs-on: ${{ vars.MEET_RUNNER || 'ubuntu-latest' }}
+        timeout-minutes: 30
+        env:
+            MEET_URL: http://localhost:9080/meet
+            MEET_API_KEY: ${{ secrets.MEET_API_KEY || 'meet-api-key' }}
+            MEET_WEBHOOK_PORT: '6080'
+        defaults:
+            run:
+                working-directory: .tests
+        steps:
+            - uses: actions/checkout@v5
+
+            - name: Also run the recording capture test on the nightly run
+              if: ${{ github.event.inputs.run_recordings == 'true' || github.event_name == 'schedule' }}
+              run: echo "MEET_E2E_RECORDINGS=1" >> "$GITHUB_ENV"
+
+            - name: Deploy OpenVidu Local Deployment
+              uses: OpenVidu/actions/start-openvidu-local-deployment@070fb73fda8fe7a08e28991b1c2d276f12a009ef # v1.0.22
+              with:
+                  ref-openvidu-local-deployment: development
+                  openvidu-edition: community
+                  timeout: '300000'
+
+            - uses: actions/setup-node@v5
+              with:
+                  node-version: '24.15.0'
+
+            - name: Install the test runner
+              run: npm ci
+
+            - name: Install Chromium
+              run: npx playwright install --with-deps chromium
+
+            # `npm ci` per tutorial, which also fails when a package-lock.json has drifted from its
+            # package.json — a regression worth catching on its own.
+            - name: Install tutorial dependencies
+              run: npm run install:tutorials
+
+            - name: Wait for the Meet server
+              run: |
+                  echo "Waiting for $MEET_URL to answer..."
+                  for i in $(seq 1 90); do
+                      status=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 \
+                          -H "X-API-KEY: $MEET_API_KEY" "$MEET_URL/api/v1/rooms?maxItems=1" || true)
+                      if [ "$status" = "200" ]; then
+                          echo "Up after $((i * 5))s."
+                          exit 0
+                      fi
+                      sleep 5
+                  done
+                  echo "::error::$MEET_URL never answered within $((90 * 5))s."
+                  (cd ../openvidu-local-deployment/community && docker compose logs --tail=200)
+                  exit 1
+
+            - name: Run the tests
+              run: npm test
+
+            - if: ${{ !cancelled() }}
+              uses: actions/upload-artifact@v4
+              with:
+                  name: playwright-report
+                  path: .tests/playwright-report/
+                  retention-days: 14
+
+            - name: Tear down OpenVidu Local Deployment
+              if: ${{ always() }}
+              working-directory: openvidu-local-deployment/community
+              run: docker compose down --volumes

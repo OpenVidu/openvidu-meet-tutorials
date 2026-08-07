@@ -1,0 +1,18 @@
+{
+	"name": "openvidu-meet-tutorials-tests",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"description": "Playwright test runner for the OpenVidu Meet tutorials. Each tutorial owns its specs under its own tests/ folder; this package only provides the runner and the shared harness in harness/. Lives under .tests/ so it never reads as a tutorial of its own. No tutorial depends on it: they all stay self-contained npm projects.",
+	"scripts": {
+		"test": "playwright test",
+		"test:headed": "playwright test --headed",
+		"test:ui": "playwright test --ui",
+		"report": "playwright show-report",
+		"install:tutorials": "node harness/install-tutorials.js",
+		"install:browsers": "playwright install chromium"
+	},
+	"devDependencies": {
+		"@playwright/test": "1.62.1"
+	}
+}

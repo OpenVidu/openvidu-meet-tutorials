@@ -29,3 +29,24 @@ npm install
 ```bash
 npm start
 ```
+
+## Tests
+
+This tutorial has its own [Playwright](https://playwright.dev) tests in [`tests/`](tests). They boot it
+against a real OpenVidu Meet server and drive it in a browser. Run them from the repository root:
+
+```bash
+cd ../..
+npm install                                            # the test runner, once
+npm run install:browsers                               # Chromium, once
+
+npx playwright test embedding-options/meet-webcomponent-basic
+```
+
+Point them at whichever Meet server you use:
+
+```bash
+MEET_URL=http://localhost:6080/meet npx playwright test embedding-options/meet-webcomponent-basic
+```
+
+See [`../../.tests/README.md`](../../.tests/README.md) for the details.

@@ -1,0 +1,6 @@
+# Test runner, under .tests/ (see .tests/README.md). Each tutorial keeps its own .gitignore.
+node_modules/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

@@ -123,6 +123,12 @@ export const dismissMeetingEndedPanel = async (page, { timeout = 45_000 } = {}) 
 	return reason;
 };
 
-/** Current recording status as Meet displays it, uppercased. */
+/**
+ * Current recording status, uppercased.
+ *
+ * Reads the `data-status` attribute rather than the element's text: the text is translated and
+ * redesign-prone (e.g. "Recording" for the active state), while `data-status` carries Meet's raw
+ * `RecordingState` value and is the stable contract.
+ */
 export const recordingStatus = async (page) =>
-	(await page.locator(MEET_UI.recordingStatus).first().innerText()).trim().toUpperCase();
+	(await page.locator(MEET_UI.recordingStatus).first().getAttribute('data-status')).toUpperCase();

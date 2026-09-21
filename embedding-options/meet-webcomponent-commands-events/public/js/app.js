@@ -163,7 +163,7 @@ function accessRoom(roomName, roomUrl, role) {
 	const meet = document.querySelector('openvidu-meet');
 
 	// Event listener for when the local participant joins the meeting
-	meet.once('joined', () => {
+	meet.once('meetingJoined', () => {
 		console.log('Local participant joined the meeting');
 
 		// Show the room header with the room name
@@ -180,11 +180,11 @@ function accessRoom(roomName, roomUrl, role) {
 		// The "End meeting" command is available only to moderators
 		const endMeetingButton = document.querySelector('#end-meeting-btn');
 		endMeetingButton.hidden = role !== 'moderator';
-		endMeetingButton.onclick = role === 'moderator' ? () => meet.endMeeting() : null;
+		endMeetingButton.onclick = role === 'moderator' ? () => meet.meetingEnd() : null;
 	});
 
 	// Event listener for when the local participant leaves the room
-	meet.once('left', (event) => {
+	meet.once('meetingLeft', (event) => {
 		console.log('Local participant left the room. Reason:', event.reason);
 
 		// Hide the room header
@@ -192,7 +192,7 @@ function accessRoom(roomName, roomUrl, role) {
 	});
 
 	// Event listener for when the OpenVidu Meet component is closed
-	meet.once('closed', () => {
+	meet.once('meetingClosed', () => {
 		console.log('OpenVidu Meet component closed');
 
 		// Clear the OpenVidu Meet component and go back to the home screen

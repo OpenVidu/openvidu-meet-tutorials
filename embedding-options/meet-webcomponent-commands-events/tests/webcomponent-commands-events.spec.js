@@ -10,10 +10,10 @@ import { tutorialById } from '../../../.tests/harness/tutorials.js';
  * This tutorial builds its own room header out of the component's events and sends it commands, so the
  * tests watch that contract from both directions through the tutorial's visible reaction:
  *
- *   joined  → the custom room header appears
- *   left    → the header disappears
- *   closed  → the application returns to its rooms list
- *   endMeeting command → the meeting really ends, for everyone
+ *   meetingJoined → the custom room header appears
+ *   meetingLeft   → the header disappears
+ *   meetingClosed → the application returns to its rooms list
+ *   meetingEnd command → the meeting really ends, for everyone
  */
 const tutorial = tutorialById('webcomponent-commands-events');
 
@@ -23,7 +23,7 @@ describeBootsAndServes(tutorial);
 describeRoomLifecycle(tutorial);
 
 test.describe('WebComponent Commands & Events: reacting to the real component', () => {
-	test("'joined' shows the room header, and a moderator gets the End meeting button", async ({
+	test("'meetingJoined' shows the room header, and a moderator gets the End meeting button", async ({
 		ui,
 		page,
 		meet,
@@ -34,14 +34,14 @@ test.describe('WebComponent Commands & Events: reacting to the real component', 
 		await ui.reload();
 
 		await ui.moderatorAccess(room.roomName).click();
-		// The header is driven entirely by the component's 'joined' event.
+		// The header is driven entirely by the component's 'meetingJoined' event.
 		await expect(ui.roomHeader).toBeHidden();
 		// Unlike the previous tutorial, leaving is handled through events, not through an attribute.
 		await expect(ui.meetElement).not.toHaveAttribute('leave-redirect-url', /.*/);
 
 		await joinMeeting(page, 'E2E Moderator');
 
-		await expect(ui.roomHeader, "the component must still emit 'joined'").toBeVisible();
+		await expect(ui.roomHeader, "the component must still emit 'meetingJoined'").toBeVisible();
 		await expect(ui.roomHeaderName).toHaveText(room.roomName);
 		await expect(ui.roomRoleBadge).toContainText('moderator');
 		await expect(ui.endMeetingButton).toBeVisible();
@@ -62,7 +62,7 @@ test.describe('WebComponent Commands & Events: reacting to the real component', 
 		expect(await ui.endMeetingButton.evaluate((button) => button.onclick)).toBeNull();
 	});
 
-	test('the endMeeting command ends the meeting and closes the component', async ({
+	test('the meetingEnd command ends the meeting and closes the component', async ({
 		ui,
 		page,
 		meet,
@@ -77,8 +77,8 @@ test.describe('WebComponent Commands & Events: reacting to the real component', 
 
 		await ui.endMeetingButton.click();
 
-		// 'left' fires as soon as the meeting is over, and the tutorial hides its header.
-		await expect(ui.roomHeader, "the component must still emit 'left'").toBeHidden({ timeout: 45_000 });
+		// 'meetingLeft' fires as soon as the meeting is over, and the tutorial hides its header.
+		await expect(ui.roomHeader, "the component must still emit 'meetingLeft'").toBeHidden({ timeout: 45_000 });
 		// Meet then shows its own "Meeting Ended" panel and waits to be acknowledged: leaving a meeting is
 		// not the same as closing the component, so the application is still showing the room view here.
 		await expect(ui.roomView).toBeVisible();
@@ -86,8 +86,8 @@ test.describe('WebComponent Commands & Events: reacting to the real component', 
 
 		expect(reason).toContain('Meeting Ended');
 
-		// Only now does 'closed' arrive and the application take its view back.
-		await expect(ui.home, "the component must still emit 'closed' once the end is acknowledged").toBeVisible({
+		// Only now does 'meetingClosed' arrive and the application take its view back.
+		await expect(ui.home, "the component must still emit 'meetingClosed' once the end is acknowledged").toBeVisible({
 			timeout: 45_000
 		});
 		await expect(ui.meetElement, 'the component must be removed so it releases its resources').toHaveCount(0);
@@ -116,7 +116,7 @@ test.describe('WebComponent Commands & Events: reacting to the real component', 
 			await joinMeeting(page, 'E2E Moderator');
 			await ui.endMeetingButton.click();
 
-			// endMeeting is room-wide: the speaker's meeting layout goes away as well.
+			// meetingEnd is room-wide: the speaker's meeting layout goes away as well.
 			await expect(speakerPage.locator(MEET_UI.layout)).toBeHidden({ timeout: 60_000 });
 		} finally {
 			await speakerContext.close();

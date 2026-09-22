@@ -192,7 +192,7 @@ function accessRoom(roomName, roomUrl, role) {
 	});
 
 	// Event listener for when the OpenVidu Meet component is closed
-	meet.once('meetingClosed', () => {
+	meet.once('viewClosed', () => {
 		console.log('OpenVidu Meet component closed');
 
 		// Clear the OpenVidu Meet component and go back to the home screen

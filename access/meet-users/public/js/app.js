@@ -540,7 +540,7 @@ function accessRoom(roomUrl, returnViewId) {
 
 	// Add event listener for when the OpenVidu Meet component is closed
 	const meet = document.querySelector('openvidu-meet');
-	meet.once('meetingClosed', () => {
+	meet.once('viewClosed', () => {
 		console.log('OpenVidu Meet component closed');
 
 		// Clear the OpenVidu Meet component and go back to the view we came from

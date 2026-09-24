@@ -12,7 +12,7 @@ import { tutorialById } from '../../../.tests/harness/tutorials.js';
  *
  *   meetingJoined → the custom room header appears
  *   meetingLeft   → the header disappears
- *   viewClosed    → the application returns to its rooms list
+ *   embeddedCloseRequested → the application returns to its rooms list
  *   meetingEnd command → the meeting really ends, for everyone
  */
 const tutorial = tutorialById('webcomponent-commands-events');
@@ -86,10 +86,11 @@ test.describe('WebComponent Commands & Events: reacting to the real component', 
 
 		expect(reason).toContain('Meeting Ended');
 
-		// Only now does 'viewClosed' arrive and the application take its view back.
-		await expect(ui.home, "the component must still emit 'viewClosed' once the end is acknowledged").toBeVisible({
-			timeout: 45_000
-		});
+		// Only now does 'embeddedCloseRequested' arrive, and the application removes the component.
+		await expect(
+			ui.home,
+			"the component must still emit 'embeddedCloseRequested' once the end is acknowledged"
+		).toBeVisible({ timeout: 45_000 });
 		await expect(ui.meetElement, 'the component must be removed so it releases its resources').toHaveCount(0);
 		await expect(ui.room(room.roomName)).toBeVisible();
 

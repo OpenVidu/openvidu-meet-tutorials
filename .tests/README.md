@@ -32,7 +32,7 @@ spec does the same for the fields specific to it (a member's `type`/`baseRole`, 
 to keep in sync.
 
 The suites also confirm **the component still emits the events and accepts the commands** the
-tutorials rely on (`joined`, `left`, `closed`, `endMeeting`), observed through the tutorial's own
+tutorials rely on (`meetingJoined`, `meetingLeft`, `embeddedCloseRequested`, `meetingEnd`), observed through the tutorial's own
 reaction to them.
 
 ## Running
@@ -167,6 +167,6 @@ broke.
 - **Register everything you create with `cleanup`**, so a failed run never leaves rooms or users behind on
   a shared deployment.
 - **Leaving a meeting is not closing the component.** Meet shows a "Meeting Ended" panel and waits for it
-  to be acknowledged before the component emits `closed`; use `dismissMeetingEndedPanel(page)`.
+  to be acknowledged before the component emits `embeddedCloseRequested`; use `dismissMeetingEndedPanel(page)`.
 - **Assert against the API, not only the page.** `meet.listRooms()`, `meet.listMembers()` and friends are
   what prove the tutorial really did something rather than just rendering optimistically.

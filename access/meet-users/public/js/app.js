@@ -518,7 +518,7 @@ function accessAsUser() {
 }
 
 // Embed the OpenVidu Meet component for the given room URL.
-// 'returnViewId' is the view to show again when the meeting is closed
+// 'returnViewId' is the view to show again when the participant asks to close OpenVidu Meet
 // (the home screen for anonymous access, the members screen for a user or identified guest).
 function accessRoom(roomUrl, returnViewId) {
 	// Hide the home and members screens and show the room screen
@@ -538,9 +538,9 @@ function accessRoom(roomUrl, returnViewId) {
         </openvidu-meet>
     `;
 
-	// Add event listener for when the OpenVidu Meet component is closed
+	// Add event listener for when the participant asks to close OpenVidu Meet
 	const meet = document.querySelector('openvidu-meet');
-	meet.once('viewClosed', () => {
+	meet.once('embeddedCloseRequested', () => {
 		console.log('OpenVidu Meet component closed');
 
 		// Clear the OpenVidu Meet component and go back to the view we came from

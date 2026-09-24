@@ -200,8 +200,8 @@ function accessRoom(roomName, roomUrl, role) {
 		roomHeader.hidden = true;
 	});
 
-	// Event listener for when the OpenVidu Meet component is closed
-	meet.once('viewClosed', () => {
+	// Event listener for when the participant asks to close OpenVidu Meet
+	meet.once('embeddedCloseRequested', () => {
 		console.log('OpenVidu Meet component closed');
 
 		// Clear the OpenVidu Meet component and go back to the home screen
@@ -332,9 +332,9 @@ async function displayRecording(recordingId) {
         </openvidu-meet>
     `;
 
-	// Add event listener for when the OpenVidu Meet component is closed
+	// Add event listener for when the participant asks to close OpenVidu Meet
 	const meet = document.querySelector('openvidu-meet');
-	meet.once('viewClosed', () => {
+	meet.once('embeddedCloseRequested', () => {
 		// Clear the OpenVidu Meet component and go back to the recordings screen
 		displayRecordingScreen.innerHTML = '';
 		displayRecordingScreen.hidden = true;
